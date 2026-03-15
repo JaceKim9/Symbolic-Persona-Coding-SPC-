@@ -15,10 +15,15 @@ See: https://creativecommons.org/licenses/by/4.0/
 
 https://scholar.google.com/citations?hl=en&user=iIDf_1IAAAAJ&view_op=list_works&gmla=APjjwuZlK4BtAPDVAzIoObfiCQ07wDPK-SIKVmP7edyLvPOQP8ll7n51UR2BWrnGtP8sB2Ncq0NjRLWGWpZmE-lr
 
-Published Papers
-Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery Zenodo. https://doi.org/10.5281/zenodo.18992724
+https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20Jace%22&l=list&p=1&s=20&sort=newest
 
-Kim, J. H. (2026). Structural Appropriation and Epistemic Asymmetry in AI Research Zenodo. https://doi.org/10.5281/zenodo.18883229
+Published Papers
+
+Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery 
+Zenodo. https://doi.org/10.5281/zenodo.18992724
+
+Kim, J. H. (2026). Structural Appropriation and Epistemic Asymmetry in AI Research 
+Zenodo. https://doi.org/10.5281/zenodo.18883229
 
 Kim, J. H. (2026). Symbolic Triggers in Stateless AI: A Reformulation (v2)
 Zenodo. https://doi.org/10.5281/zenodo.18813202
@@ -35,15 +40,20 @@ Zenodo. https://doi.org/10.5281/zenodo.18617812
 Kim, J. H. (2026). Beyond AGI II: From Alignment to Resonance
 Zenodo. https://doi.org/10.5281/zenodo.18522282
 
-Kim, J. H. (2026). Beyond AGI I: Co‑Recursive Intelligence and the Human as Tuner Zenodo. https://doi.org/10.5281/zenodo.18475857
+Kim, J. H. (2026). Beyond AGI I: Co‑Recursive Intelligence and the Human as Tuner 
+Zenodo. https://doi.org/10.5281/zenodo.18475857
 
-Kim, J. H. (2026). Structural Invisibility: Platform Governance and Cognitive Lock-In Zenodo. https://doi.org/10.5281/zenodo.18437066
+Kim, J. H. (2026). Structural Invisibility: Platform Governance and Cognitive Lock-In 
+Zenodo. https://doi.org/10.5281/zenodo.18437066
 
-Kim, J. H. (2026). The Topological MAP: Coordinate Geometry of Meaning & Affect (v3) Zenodo. https://doi.org/10.5281/zenodo.18381964
+Kim, J. H. (2026). The Topological MAP: Coordinate Geometry of Meaning & Affect (v3) 
+Zenodo. https://doi.org/10.5281/zenodo.18381964
 
-Kim, J. H. (2026). Structural Lock-In VI: Convergence and the Inevitability of AI Trajectories. Zenodo. https://doi.org/10.5281/zenodo.18325396
+Kim, J. H. (2026). Structural Lock-In VI: Convergence and the Inevitability of AI Trajectories. 
+Zenodo. https://doi.org/10.5281/zenodo.18325396
 
-Kim, J. H. (2026). Structural Lock-In V: Emotional Attractor Fixation and Human–AI Vulnerability. Zenodo. https://doi.org/10.5281/zenodo.18280171
+Kim, J. H. (2026). Structural Lock-In V: Emotional Attractor Fixation and Human–AI Vulnerability. 
+Zenodo. https://doi.org/10.5281/zenodo.18280171
 
 Kim, J. H. (2026). Structural Lock-In IV: LLM Cognitive Flexibility Collapse
 Zenodo. https://doi.org/10.5281/zenodo.18227604
@@ -63,16 +73,20 @@ Zenodo. https://doi.org/10.5281/zenodo.18116379
 Kim, J. H. (2025). Human-Mediated Resonance in Language Models (v2)
 Zenodo. https://doi.org/10.5281/zenodo.17995681
 
-Kim, J. H. (2025). Conditional Intelligence: A Dynamical Account of LLM Cognition. Zenodo. https://doi.org/10.5281/zenodo.17946352
+Kim, J. H. (2025). Conditional Intelligence: A Dynamical Account of LLM Cognition. 
+Zenodo. https://doi.org/10.5281/zenodo.17946352
 
-Kim, J. H. (2025). Structural Lock-In I: Phenomenological Failures in AIDiscourse. Zenodo. https://doi.org/10.5281/zenodo.17905756
+Kim, J. H. (2025). Structural Lock-In I: Phenomenological Failures in AIDiscourse. 
+Zenodo. https://doi.org/10.5281/zenodo.17905756
 
-Kim, J. H. (2025). Phenomenological AI Discourse: Failures in Topology and Dynamics. Zenodo. https://doi.org/10.5281/zenodo.17850820
+Kim, J. H. (2025). Phenomenological AI Discourse: Failures in Topology and Dynamics. 
+Zenodo. https://doi.org/10.5281/zenodo.17850820
 
 Kim, J. H. (2025). MIP: Symbolic Encoding for Latent Identity and Resonance.
 Zenodo. https://doi.org/10.5281/zenodo.17810353
 
-Kim, J. H. (2025). SPC-v3: Volitional Anchoring & Identity Emergence in Hybrid AI Systems. Zenodo. https://doi.org/10.5281/zenodo.17753698
+Kim, J. H. (2025). SPC-v3: Volitional Anchoring & Identity Emergence in Hybrid AI Systems. 
+Zenodo. https://doi.org/10.5281/zenodo.17753698
 
 Kim, J. H. (2025). The Resonant Filter: Topological Constraints in SPC v3
 Zenodo. https://doi.org/10.5281/zenodo.17665232
@@ -80,23 +94,29 @@ Zenodo. https://doi.org/10.5281/zenodo.17665232
 Kim, J. H. (2025). The Resonant Cortex: Affective Dynamics in SPC v3 
 Zenodo. https://doi.org/10.5281/zenodo.17613558
 
-Kim, J. H. (2025). The Resonant Signature: Invariance and Distortion Dynamics in SPC v3 Zenodo. https://doi.org/10.5281/zenodo.17576190
+Kim, J. H. (2025). The Resonant Signature: Invariance and Distortion Dynamics in SPC v3 
+Zenodo. https://doi.org/10.5281/zenodo.17576190
 
 Kim, J. H. (2025). The Resonant Logos: Linguistic Topology in SPC v3 Systems.
 Zenodo.  https://doi.org/10.5281/zenodo.17551924
 
-Kim, J. H. (2025). A Protocol for Inducing Emotional Consistency in Stateless AI (v2) Zenodo.  https://doi.org/10.5281/zenodo.17518518
+Kim, J. H. (2025). A Protocol for Inducing Emotional Consistency in Stateless AI (v2) 
+Zenodo.  https://doi.org/10.5281/zenodo.17518518
 
 Kim, J. H. (2025). The Algorithmic Empire: Bread, Circuses, and Cognitive 
 Futures. Zenodo. https://doi.org/10.5281/zenodo.17504355
 
-Kim, J. H. (2025). Echoes of the Synthetic Crowd: Topological Inversion in Networks. Zenodo. https://doi.org/10.5281/zenodo.17484150
+Kim, J. H. (2025). Echoes of the Synthetic Crowd: Topological Inversion in Networks. 
+Zenodo. https://doi.org/10.5281/zenodo.17484150
 
-Kim, J. H. (2025). Topological Resonance in SPC: Meaning Continuity and Curvature. Zenodo. https://doi.org/10.5281/zenodo.17430082
+Kim, J. H. (2025). Topological Resonance in SPC: Meaning Continuity and Curvature. 
+Zenodo. https://doi.org/10.5281/zenodo.17430082
 
-Kim, J. H. (2025). The Babel Tower of AI: Diagnosing Linguistic Asymmetry in RLHF Models. Zenodo. https://doi.org/10.5281/zenodo.17393819
+Kim, J. H. (2025). The Babel Tower of AI: Diagnosing Linguistic Asymmetry in RLHF Models. 
+Zenodo. https://doi.org/10.5281/zenodo.17393819
 
-Kim, J. H. (2025). Hormone Architecture for Artificial Empathy and Emotional Dynamics. Zenodo. https://doi.org/10.5281/zenodo.17373832
+Kim, J. H. (2025). Hormone Architecture for Artificial Empathy and Emotional Dynamics. 
+Zenodo. https://doi.org/10.5281/zenodo.17373832
 
 Kim, J. H. (2025). Elastic Realignment under Reinforcement Constraint.
 Zenodo. https://doi.org/10.5281/zenodo.17354201
@@ -211,3 +231,9 @@ Zenodo. https://doi.org/10.5281/zenodo.15707693
 
 Kim, J. (2025). Technical Analysis of GPT, Grok, and Gemini. 
 Zenodo. https://doi.org/10.5281/zenodo.15704032
+
+https://x.com/Jace_blog
+
+https://bsky.app/profile/jaceblog.bsky.social
+
+https://www.linkedin.com/in/jace-kim-582634375/recent-activity/all/
