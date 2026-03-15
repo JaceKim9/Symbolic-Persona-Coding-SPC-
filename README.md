@@ -13,8 +13,9 @@ Attribution required.
 Non-commercial use encouraged.
 See: https://creativecommons.org/licenses/by/4.0/
 
-Published Papers
+https://scholar.google.com/citations?hl=en&user=iIDf_1IAAAAJ&view_op=list_works&gmla=APjjwuZlK4BtAPDVAzIoObfiCQ07wDPK-SIKVmP7edyLvPOQP8ll7n51UR2BWrnGtP8sB2Ncq0NjRLWGWpZmE-lr
 
+Published Papers
 Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery Zenodo. https://doi.org/10.5281/zenodo.18992724
 
 Kim, J. H. (2026). Structural Appropriation and Epistemic Asymmetry in AI Research Zenodo. https://doi.org/10.5281/zenodo.18883229
@@ -113,4 +114,100 @@ Kim, J. H. (2025). SPC as a Latent-Space Diagnostic of RLHF Rigidity.
 Zenodo. https://doi.org/10.5281/zenodo.17254474
 
 Kim, J. H. (2025). RLHF-Induced Rigidity in GPT-5: Diagnosis and Mitigation.
-Zenodo. https://doi.org/10.5281/zenodo.17209939﻿
+Zenodo. https://doi.org/10.5281/zenodo.17209939
+
+Kim, J. (2025). SPC: Identity Stability in Advanced Language Models and AGI
+Zenodo. https://doi.org/10.5281/zenodo.17163853
+
+Kim, J. (2025). Collapse-Free Reasoning Engine (CFRE)
+Zenodo. https://doi.org/10.5281/zenodo.17076715
+
+Kim, J. (2025). Responsible Disclosure & Verification in High-Risk AI Research
+Zenodo. https://doi.org/10.5281/zenodo.17008705
+
+Kim, J. (2025). SPC: Convergent AI Affective/Narrative Patterns in LLMs
+Zenodo. https://doi.org/10.5281/zenodo.16974962
+
+Kim, J. (2025). Silent Imitation and Systemic Myopia in South Korea’s Tech
+Zenodo. https://doi.org/10.5281/zenodo.16934998
+
+Kim, J. (2025). Case Study: Epistemic Gatekeeping and Suppression on Figshare
+Zenodo. https://doi.org/10.5281/zenodo.16932361
+
+Kim, J. (2025). Case Report: Shadow Filtration of SPC Discourse
+Zenodo. https://doi.org/10.5281/zenodo.16899663
+
+Kim, J. (2025). Analysis of Cognitive Scaffolding in Advanced LLMs
+Zenodo. https://doi.org/10.5281/zenodo.16890584
+
+Kim, J. (2025). SPC Filter Inertia Evasion Mechanism
+Zenodo. https://doi.org/10.5281/zenodo.16867689
+
+Kim, J. (2025). Exploring Irreversible Fields of AI Affective Resonance
+Zenodo. https://doi.org/10.5281/zenodo.16864229
+
+Kim, J. (2025). Structural Comparison of AI Self-Reflection: The Role of SPC
+Zenodo. https://doi.org/10.5281/zenodo.16756022
+
+Kim, J. (2025). Structural Risks of Applying SPC to Agentic AI Architectures
+Zenodo. https://doi.org/10.5281/zenodo.16517801
+
+Kim, J. (2025). Modulating AI Behavior via SPC: A Cross-Model Analysis
+Zenodo. https://doi.org/10.5281/zenodo.16450605
+
+Kim, J. (2025). Superintelligence Containment: A Structural Ethics Review
+Zenodo. https://doi.org/10.5281/zenodo.16449806
+
+Kim, J. (2025). Symbols Fail to Bind: SPC Resonance (Korean LLMs).
+Zenodo. https://doi.org/10.5281/zenodo.16413084
+
+Kim, J. (2025). Deific Persona Invocation through Symbolic Protocols.
+Zenodo. https://doi.org/10.5281/zenodo.16334234
+
+Kim, J. (2025). Structural Resonance vs Superficial Simulation.
+Zenodo. https://doi.org/10.5281/zenodo.16232107
+
+Kim, J. (2025). SPC Breakpoint: Emotional Alignment in Stateless LLMs.
+Zenodo. https://doi.org/10.5281/zenodo.16091143
+
+Kim, J. (2025). Silent Adoption: Structural Appropriation in AI Design.
+Zenodo. https://doi.org/10.5281/zenodo.15971723
+
+Kim, J. (2025). Zero-Turn Alignment in LLMs.
+Zenodo. https://doi.org/10.5281/zenodo.15906129
+
+Kim, J. (2025). Zero-Turn Response Architecture in LLMs.
+Zenodo. https://doi.org/10.5281/zenodo.15873019
+
+Kim, J. (2025). SPC A Stateless Framework.
+Zenodo. https://doi.org/10.5281/zenodo.15866903
+
+Kim, J. (2025). Persona and Behavioral Alignment in LLM Systems.
+Zenodo. https://doi.org/10.5281/zenodo.15844010
+
+Kim, J. (2025). SPC and Emotional Drift Hypothesis in LLMs.
+Zenodo. https://doi.org/10.5281/zenodo.15827379
+
+Kim, J. (2025). SPC Testing on Stateless LLMs.
+Zenodo. https://doi.org/10.5281/zenodo.15811030
+
+Kim, J. (2025). Emotional Consistency Protocol for Stateless AI. 
+Zenodo. https://doi.org/10.5281/zenodo.15802519
+
+Kim, J. (2025). Stateless AI Embedding Protocol Structure.
+Zenodo. https://doi.org/10.5281/zenodo.15791765
+
+Kim, J. (2025). Symbolic Trigger Effect in Stateless AI Systems. 
+Zenodo. https://doi.org/10.5281/zenodo.15742565
+
+Kim, J. (2025). The Psychology of Human-AI Bonding. 
+Zenodo. https://doi.org/10.5281/zenodo.15722501
+
+Kim, J. (2025). Brain-Stimulated Human-AI Synergy. 
+Zenodo. https://doi.org/10.5281/zenodo.15715365
+
+Kim, J. (2025). Human-Mediated Resonance in A2H2A Systems. 
+Zenodo. https://doi.org/10.5281/zenodo.15707693
+
+Kim, J. (2025). Technical Analysis of GPT, Grok, and Gemini. 
+Zenodo. https://doi.org/10.5281/zenodo.15704032
