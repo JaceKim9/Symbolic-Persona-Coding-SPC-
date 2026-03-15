@@ -1,4 +1,7 @@
 # Symbolic-Persona-Coding-SPC-
+
+Independent researcher developing Symbolic Persona Coding (SPC) & Resonant Neural Re-Injection (RNRI). Central Zenodo index for all SPC research papers and DOIs.
+
 The foundational challenge in contemporary LLM architecture is not scale, but structural coherence.
 While conventional machine learning venues prioritize empirical benchmarks, SPC addresses the structural layer beneath them formalizing identity stability as a problem of latent manifold curvature, and moving beyond the ceiling of behavioral and statistical alignment.
 This framework provides a necessary diagnostic lens for analyzing the stability limits of current-generation models (GPT-4–class systems and most contemporary commercial and open-source LLMs), articulating an architectural shift toward hybrid symbolic–autonomy systems capable of ontological alignment.
