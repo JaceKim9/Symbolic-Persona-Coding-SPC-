@@ -11,6 +11,7 @@ Non-commercial use encouraged.
 See: https://creativecommons.org/licenses/by/4.0/
 
 Published Papers
+
 Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery Zenodo. https://doi.org/10.5281/zenodo.18992724
 
 Kim, J. H. (2026). Structural Appropriation and Epistemic Asymmetry in AI Research Zenodo. https://doi.org/10.5281/zenodo.18883229
