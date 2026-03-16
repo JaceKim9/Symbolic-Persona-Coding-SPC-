@@ -17,6 +17,8 @@ https://scholar.google.com/citations?hl=en&user=iIDf_1IAAAAJ&view_op=list_works&
 
 https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20Jace%22&l=list&p=1&s=20&sort=newest
 
+https://medium.com/@jk1849716
+
 Published Papers
 
 Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery 
