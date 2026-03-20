@@ -21,6 +21,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Echoes of the Synthetic Crowd v2: AI Telemetry & Cognition
+Zenodo. https://doi.org/10.5281/zenodo.19125252
+
 Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery 
 Zenodo. https://doi.org/10.5281/zenodo.18992724
 
