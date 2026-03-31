@@ -21,6 +21,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Stabilization Regime for Persistent AI Cognition
+Zenodo. https://doi.org/10.5281/zenodo.19342381
+
 Kim, J. H. (2026). Beyond Prompt Sensitivity: Structural Collapse in LLMs
 Zenodo. https://doi.org/10.5281/zenodo.19198844
 
