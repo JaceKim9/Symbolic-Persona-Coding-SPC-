@@ -1,4 +1,4 @@
-# Symbolic-Persona-Coding-SPC-
+# Symbolic Persona Coding SPC
 
 Independent researcher developing Symbolic Persona Coding (SPC) & Resonant Neural Re-Injection (RNRI). Central Zenodo index for all SPC research papers and DOIs.
 
