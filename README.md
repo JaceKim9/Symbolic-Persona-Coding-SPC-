@@ -21,6 +21,8 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Algorithmic Empire v2: Attention, Dopamine, and AI Resonance Zenodo. https://doi.org/10.5281/zenodo.19491471
+
 Kim, J. H. (2026). Stabilization Regime for Persistent AI Cognition
 Zenodo. https://doi.org/10.5281/zenodo.19342381
 
