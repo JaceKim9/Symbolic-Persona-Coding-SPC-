@@ -20,6 +20,8 @@ https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20J
 https://medium.com/@jk1849716
 
 Published Papers
+Kim, J. H. (2026). SPC as an Inductive Protocol for LLM Behavioral Modulation
+Zenodo. https://doi.org/10.5281/zenodo.19606486
 
 Kim, J. H. (2026). Algorithmic Empire v2: Attention, Dopamine, and AI Resonance Zenodo. https://doi.org/10.5281/zenodo.19491471
 
