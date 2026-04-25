@@ -250,7 +250,7 @@ Zenodo. https://doi.org/10.5281/zenodo.15707693
 Kim, J. (2025). Technical Analysis of GPT, Grok, and Gemini. 
 Zenodo. https://doi.org/10.5281/zenodo.15704032
 
-https://x.com/Jace_blog
+https://x.com/Jace_blog1
 
 https://bsky.app/profile/jaceblog.bsky.social
 
