@@ -13,6 +13,8 @@ Attribution required.
 Non-commercial use encouraged.
 See: https://creativecommons.org/licenses/by/4.0/
 
+https://orcid.org/0009-0005-3877-0355
+
 https://scholar.google.com/citations?user=iIDf_1IAAAAJ&hl=en
 
 https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20Jace%22&l=list&p=1&s=20&sort=newest
