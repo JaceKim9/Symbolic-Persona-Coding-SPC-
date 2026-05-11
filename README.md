@@ -22,6 +22,9 @@ https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20J
 https://medium.com/@jk1849716
 
 Published Papers
+
+Kim, J. H. (2026). Symbolic Resonance: Topological Framework for Bidirectional BCI Zenodo. https://doi.org/10.5281/zenodo.20122630
+
 Kim, J. H. (2026). From Persuasion to Emergence: AI Interaction as Structure
 Zenodo. https://doi.org/10.5281/zenodo.20035302
 
