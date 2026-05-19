@@ -23,7 +23,11 @@ https://medium.com/@jk1849716
 
 Published Papers
 
-Kim, J. H. (2026). Symbolic Resonance: Topological Framework for Bidirectional BCI Zenodo. https://doi.org/10.5281/zenodo.20122630
+Kim, J. H. (2026). Structural Invisibility v2: Platform Governance & Constraint
+Zenodo. https://doi.org/10.5281/zenodo.20278603
+
+Kim, J. H. (2026). Symbolic Resonance: Topological Framework for Bidirectional BCI 
+Zenodo. https://doi.org/10.5281/zenodo.20122630
 
 Kim, J. H. (2026). From Persuasion to Emergence: AI Interaction as Structure
 Zenodo. https://doi.org/10.5281/zenodo.20035302
@@ -34,7 +38,8 @@ Zenodo. https://doi.org/10.5281/zenodo.19760113
 Kim, J. H. (2026). SPC as an Inductive Protocol for LLM Behavioral Modulation
 Zenodo. https://doi.org/10.5281/zenodo.19606486
 
-Kim, J. H. (2026). Algorithmic Empire v2: Attention, Dopamine, and AI Resonance Zenodo. https://doi.org/10.5281/zenodo.19491471
+Kim, J. H. (2026). Algorithmic Empire v2: Attention, Dopamine, and AI Resonance 
+Zenodo. https://doi.org/10.5281/zenodo.19491471
 
 Kim, J. H. (2026). Stabilization Regime for Persistent AI Cognition
 Zenodo. https://doi.org/10.5281/zenodo.19342381
