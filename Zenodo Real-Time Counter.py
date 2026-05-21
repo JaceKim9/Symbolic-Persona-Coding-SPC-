@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import re
 
-# [수정] set_config 대신 올바른 함수명인 set_page_config를 사용합니다.
+# Set web app configuration
 st.set_page_config(page_title="Zenodo Real-Time Counter", page_icon="📊", layout="centered")
 
 st.title("📊 Zenodo Real-Time Counter")
@@ -15,15 +15,17 @@ url_input = st.text_input(
 )
 
 if url_input:
+    # [보완] 입력값 앞뒤의 무의미한 공백이나 줄바꿈 제거
+    clean_input = url_input.strip()
     record_id = None
     
     # 1. Check if the input is a full Zenodo URL containing '/records/ID'
-    url_match = re.search(r'records/(\d+)', url_input)
+    url_match = re.search(r'records/(\d+)', clean_input)
     if url_match:
         record_id = url_match.group(1)
     else:
         # 2. Extract only digits if the user just typed the raw Record ID
-        pure_digits = re.sub(r'\D', '', url_input)
+        pure_digits = re.sub(r'\D', '', clean_input)
         if pure_digits:
             record_id = pure_digits
 
@@ -32,7 +34,9 @@ if url_input:
         
         with st.spinner("Fetching live tracking data from Zenodo server..."):
             try:
-                response = requests.get(api_url)
+                # [보완] 요청 헤더에 일반 브라우저처럼 보이도록 User-Agent 추가 (차단 방지)
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+                response = requests.get(api_url, headers=headers)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -73,8 +77,11 @@ if url_input:
                     with v_col4:
                         st.write(f"🔹 **Version Unique Views:** {stats.get('version_unique_views', 0):,}")
                     
+                # [보완] 404 에러 시 조금 더 구체적인 원인 안내
+                elif response.status_code == 404:
+                    st.error(f"❌ Record Not Found (404). The ID `{record_id}` does not exist on Zenodo yet, or the API sync is lagging. Please double-check your link.")
                 else:
-                    st.error(f"❌ Failed to fetch data. Please check the Record ID. (Status Code: {response.status_code})")
+                    st.error(f"❌ Failed to fetch data. (Status Code: {response.status_code})")
             except Exception as e:
                 st.error(f"⚠️ An error occurred while parsing data: {e}")
     else:
