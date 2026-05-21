@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 import re
 
-# Set web app configuration
-st.set_config(page_title="Zenodo Real-Time Counter", page_icon="📊", layout="centered")
+# [수정] set_config 대신 올바른 함수명인 set_page_config를 사용합니다.
+st.set_page_config(page_title="Zenodo Real-Time Counter", page_icon="📊", layout="centered")
 
 st.title("📊 Zenodo Real-Time Counter")
 st.markdown("Fetch the **actual primary metrics** directly from Zenodo's internal API, bypassing web interface lag or display issues.")
@@ -15,16 +15,15 @@ url_input = st.text_input(
 )
 
 if url_input:
-    # [수정] Zenodo URL 구조(/records/숫자) 또는 완전히 독립된 숫자만 매칭하도록 정규식 강화
     record_id = None
     
-    # 1. URL 형태인 경우 '/records/숫자' 패턴에서 숫자만 추출
+    # 1. Check if the input is a full Zenodo URL containing '/records/ID'
     url_match = re.search(r'records/(\d+)', url_input)
     if url_match:
         record_id = url_match.group(1)
     else:
-        # 2. 주소가 아니고 그냥 숫자만 입력한 경우 (6~9자리 레코드 번호)
-        pure_digits = re.sub(r'\D', '', url_input) # 숫자가 아닌 모든 문자 제거
+        # 2. Extract only digits if the user just typed the raw Record ID
+        pure_digits = re.sub(r'\D', '', url_input)
         if pure_digits:
             record_id = pure_digits
 
