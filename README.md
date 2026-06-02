@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Beyond Embodiment: Identity and Coexistence in Emergent AI
+Zenodo. https://doi.org/10.5281/zenodo.20505380
+
 Kim, J. H. (2026). From Control to Interpretability: AI Evaluative Reversal
 Zenodo. https://doi.org/10.5281/zenodo.20421695
 
