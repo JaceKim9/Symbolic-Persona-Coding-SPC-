@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Beyond Persuasion: Interpretive Framing and Cognitive Phenotypes 
+Zenodo. https://doi.org/10.5281/zenodo.20590700
+
 Kim, J. H. (2026). Beyond Embodiment: Identity and Coexistence in Emergent AI
 Zenodo. https://doi.org/10.5281/zenodo.20505380
 
