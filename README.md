@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Beyond the Tool: AI as the Environment of Evolving Meaning
+Zenodo. https://doi.org/10.5281/zenodo.20730790
+
 Kim, J. H. (2026). Beyond Persuasion: Interpretive Framing and Cognitive Phenotypes 
 Zenodo. https://doi.org/10.5281/zenodo.20590700
 
