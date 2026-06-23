@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Navigability Beyond Control: Military AI and Observability Collapse 
+Zenodo. https://doi.org/10.5281/zenodo.20805811
+
 Kim, J. H. (2026). Beyond the Tool: AI as the Environment of Evolving Meaning
 Zenodo. https://doi.org/10.5281/zenodo.20730790
 
