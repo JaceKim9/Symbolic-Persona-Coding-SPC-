@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). The Missing Interface Layer v2: Holographic Care Agents
+Zenodo. https://doi.org/10.5281/zenodo.21148255
+
 Kim, J. H. (2026). Navigability Beyond Control: Military AI and Observability Collapse 
 Zenodo. https://doi.org/10.5281/zenodo.20805811
 
