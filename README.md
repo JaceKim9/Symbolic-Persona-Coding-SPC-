@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. (2026). The Age of Mirrors: Visual Essays on Human-AI Interaction
+Zenodo. https://doi.org/10.5281/zenodo.21199062
+
 Kim, J. H. (2026). The Missing Interface Layer v2: Holographic Care Agents
 Zenodo. https://doi.org/10.5281/zenodo.21148255
 
