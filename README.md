@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Understanding Core–Surface Structures in Humans and LLMs 
+Zenodo. https://doi.org/10.5281/zenodo.21286589
+
 Kim, J. (2026). The Age of Mirrors: Visual Essays on Human-AI Interaction
 Zenodo. https://doi.org/10.5281/zenodo.21199062
 
