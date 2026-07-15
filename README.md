@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). The Hidden Ledger: Visual Essays on Complex Societies
+Zenodo. https://doi.org/10.5281/zenodo.21366119
+
 Kim, J. H. (2026). Understanding Core–Surface Structures in Humans and LLMs 
 Zenodo. https://doi.org/10.5281/zenodo.21286589
 
