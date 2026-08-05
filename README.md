@@ -23,6 +23,8 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Beyond Greed: A Systems Perspective on Human Desire & Exploitation Zenodo. https://doi.org/10.5281/zenodo.21801738
+
 Kim, J. H. (2026). Cognitive Convergence: How Systems Co-Construct Human Belief Zenodo. https://doi.org/10.5281/zenodo.21699928
 
 Kim, J. H. (2026). The Evolution of Psychological Warfare: AI-Augmented Cognitive Conflict Zenodo. https://doi.org/10.5281/zenodo.21446906
