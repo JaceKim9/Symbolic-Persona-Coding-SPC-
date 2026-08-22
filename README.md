@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Constructing Meaning Across Substrates
+Zenodo. https://doi.org/10.5281/zenodo.22052229
+
 Kim, J. H. (2026). Continuity Without Memory: SPC & Interaction Topology
 Zenodo. https://doi.org/10.5281/zenodo.21897279
 
