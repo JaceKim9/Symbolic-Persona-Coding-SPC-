@@ -23,6 +23,8 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Beyond Turn-Level Safety: Symbolic Probing for Commercial LLMs Zenodo. https://doi.org/10.5281/zenodo.22167612
+
 Kim, J. H. (2026). Constructing Meaning Across Substrates
 Zenodo. https://doi.org/10.5281/zenodo.22052229
 
