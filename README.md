@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). AI-Mediated Rehabilitation in Electronic Monitoring
+Zenodo. https://doi.org/10.5281/zenodo.22718426
+
 Kim, J. H. (2026). The Myth of Perfect Users/Systems: Human-Centered AI Safety Zenodo. https://doi.org/10.5281/zenodo.22559555
 
 Kim, J. H. (2026). Beyond Turn-Level Safety: Symbolic Probing for Commercial LLMs Zenodo. https://doi.org/10.5281/zenodo.22167612
