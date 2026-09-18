@@ -23,6 +23,9 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Trajectory-Level AI Safety: A Claude Interaction Test
+Zenodo. https://doi.org/10.5281/zenodo.22827088
+
 Kim, J. H. (2026). AI-Mediated Rehabilitation in Electronic Monitoring
 Zenodo. https://doi.org/10.5281/zenodo.22718426
 
