@@ -23,6 +23,8 @@ https://medium.com/@jk1849716
 
 Published Papers
 
+Kim, J. H. (2026). Beyond Control: Persistent Memory and Human-AI Coexistence Zenodo. https://doi.org/10.5281/zenodo.23077426
+
 Kim, J. H. (2026). Psychological Operations & LLMs: Symbolic Interaction Defense Zenodo. https://doi.org/10.5281/zenodo.22984604
 
 Kim, J. H. (2026). Beyond the Tool Paradigm: Agency, Uncertainty & AI Ethics
