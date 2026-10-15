@@ -67,7 +67,7 @@ st.title("🕸️ Citation Trace")
 st.caption("Start from an ORCID, an author name, or a single paper. See the author's full publication list and, "
            "for each paper, who cites it, what it cites, and how that compares with the field. Data: OpenAlex.")
 
-with st.form("search"):
+with st.form("search_form"):
     mode = st.radio("Search by", ["ORCID", "Author name", "Paper title / DOI"], horizontal=True)
     q = st.text_input("Query", placeholder="0000-0002-1825-0097  /  Jane Doe  /  paper title  /  10.1038/nature12373")
     submitted = st.form_submit_button("Search", type="primary")
