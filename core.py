@@ -33,40 +33,51 @@ def short_id(x):
     return x.rsplit("/", 1)[-1] if x else x
 
 
+AUTH_HELP = ("OpenAlex now requires an API key (free: openalex.org/settings/api). Paste it into the sidebar "
+             "field 'OpenAlex API key'. Without a key the tiny shared daily budget runs out almost immediately.")
+
+
 @lru_cache(maxsize=8192)
-def _get(path: str, params_json: str, mailto: str):
+def _get(path: str, params_json: str, api_key: str):
     params = json.loads(params_json)
-    if mailto:
-        params["mailto"] = mailto
+    headers = {"User-Agent": "citation-trace-app"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"  # header, so the key never shows up in URLs or errors
     last = None
-    for i in range(5):
+    for i in range(4):
         try:
-            r = requests.get(f"{API}/{path}", params=params, timeout=40,
-                             headers={"User-Agent": "citation-trace-app"})
+            r = requests.get(f"{API}/{path}", params=params, headers=headers, timeout=40)
         except requests.RequestException as e:
-            last = e
+            last = type(e).__name__
             time.sleep(1.5 * (i + 1))
             continue
         if r.status_code == 200:
             return r.json()
-        if r.status_code in (429, 500, 502, 503, 504):
-            last = RuntimeError(f"HTTP {r.status_code}")
+        if r.status_code in (401, 403):
+            raise RuntimeError(f"OpenAlex rejected the request (HTTP {r.status_code}). " + AUTH_HELP)
+        if r.status_code == 429:
+            last = "HTTP 429 (rate limit or daily budget used up)"
+            time.sleep(2 * (i + 1))
+            continue
+        if r.status_code in (500, 502, 503, 504):
+            last = f"HTTP {r.status_code}"
             time.sleep(1.5 * (i + 1))
             continue
-        r.raise_for_status()
-    raise RuntimeError(f"OpenAlex request failed: {last}")
+        raise RuntimeError(f"OpenAlex returned HTTP {r.status_code} for /{path}")
+    raise RuntimeError(f"OpenAlex request failed: {last}. If this is a 429, the daily free budget may be used up "
+                       "(it resets at midnight UTC); check openalex.org/settings/usage.")
 
 
-def get(path, params, mailto=""):
+def get(path, params, api_key=""):
     # The returned dict is shared with the cache: never mutate it.
-    return _get(path, json.dumps(params, sort_keys=True), mailto or "")
+    return _get(path, json.dumps(params, sort_keys=True), api_key or "")
 
 
-def fetch_all(path, params, max_items, mailto=""):
+def fetch_all(path, params, max_items, api_key=""):
     """Cursor-paginate up to max_items. Returns (items, total_count)."""
     out, cursor, total = [], "*", 0
     while cursor and len(out) < max_items:
-        d = get(path, {**params, "per-page": 200, "cursor": cursor}, mailto)
+        d = get(path, {**params, "per_page": 100, "cursor": cursor}, api_key)
         total = d["meta"].get("count", total)
         if not d["results"]:
             break
@@ -87,12 +98,12 @@ def _inst(a):
     return ", ".join(i.get("display_name", "") for i in li if i)
 
 
-def search_authors(q, mailto=""):
+def search_authors(q, api_key=""):
     m = ORCID_RE.search(q)
     if m:
-        d = get("authors", {"filter": f"orcid:{m.group(0).upper()}"}, mailto)
+        d = get("authors", {"filter": f"orcid:{m.group(0).upper()}"}, api_key)
     else:
-        d = get("authors", {"search": q.strip(), "per-page": 10}, mailto)
+        d = get("authors", {"search": q.strip(), "per_page": 10}, api_key)
     items = []
     for a in d["results"]:
         inst = _inst(a)
@@ -100,20 +111,21 @@ def search_authors(q, mailto=""):
                  f"{a.get('works_count', 0)} works · {a.get('cited_by_count', 0)} citations")
         if a.get("orcid"):
             label += " · " + a["orcid"].replace("https://orcid.org/", "ORCID ")
-        items.append({"id": short_id(a["id"]), "name": a.get("display_name"), "label": label})
+        items.append({"id": short_id(a["id"]), "name": a.get("display_name"), "label": label,
+                      "works": a.get("works_count", 0)})
     return items
 
 
-def search_works(q, mailto=""):
+def search_works(q, api_key=""):
     q = q.strip()
     doi = DOI_RE.search(q)
     params = {"select": "id,display_name,publication_year,authorships,cited_by_count"}
     if doi:
         params["filter"] = f"doi:https://doi.org/{doi.group(0).rstrip('.,;)')}"
     else:
-        params.update({"search": q, "per-page": 8})
+        params.update({"search": q, "per_page": 8})
     items = []
-    for w in get("works", params, mailto)["results"]:
+    for w in get("works", params, api_key)["results"]:
         c = compact(w, keep_refs=False)
         items.append({"id": c["id"],
                       "label": f"{c['title']} ({c['year']}) · {fmt_authors(c['authors'])} · {c['cited_by']} citations",
@@ -147,14 +159,14 @@ def compact(w, keep_refs=True):
     return d
 
 
-def build_dataset(author_ids, label="", mailto="", max_works=500, max_citing=4000,
+def build_dataset(author_ids, label="", api_key="", max_works=500, max_citing=4000,
                   max_refs=3000, progress=lambda msg, frac: None):
     ids = list(author_ids)
     warnings = []
 
     progress("Collecting the author's works…", 0.02)
     raw, total = fetch_all("works", {"filter": "author.id:" + "|".join(ids), "select": WORK_SELECT},
-                           max_works, mailto)
+                           max_works, api_key)
     if total > len(raw):
         warnings.append(f"Collected {len(raw)} of {total} works (raise the limit in the sidebar).")
     my = {}
@@ -166,7 +178,7 @@ def build_dataset(author_ids, label="", mailto="", max_works=500, max_citing=400
         raise RuntimeError("No works found for this author ID.")
 
     citing, truncated = {}, False
-    chunks = list(chunked(sorted(my_ids), 50))
+    chunks = list(chunked(sorted(my_ids), 100))
     for i, ch in enumerate(chunks):
         progress(f"Collecting citing papers… ({i + 1}/{len(chunks)})", 0.08 + 0.5 * i / len(chunks))
         room = max_citing - len(citing)
@@ -174,7 +186,7 @@ def build_dataset(author_ids, label="", mailto="", max_works=500, max_citing=400
             truncated = True
             break
         items, tot = fetch_all("works", {"filter": "cites:" + "|".join(ch), "select": WORK_SELECT},
-                               room, mailto)
+                               room, api_key)
         if tot > len(items):
             truncated = True
         for w in items:
@@ -195,16 +207,16 @@ def build_dataset(author_ids, label="", mailto="", max_works=500, max_citing=400
     if len(ref_cnt) > len(wanted):
         warnings.append(f"Metadata fetched for the {len(wanted)} most-cited of {len(ref_cnt)} references.")
     refs = {m: my[m] for m in my_ids}
-    chunks = list(chunked(wanted, 50))
+    chunks = list(chunked(wanted, 100))
     for i, ch in enumerate(chunks):
         progress(f"Collecting reference metadata… ({i + 1}/{len(chunks)})", 0.6 + 0.38 * i / max(len(chunks), 1))
-        d = get("works", {"filter": "openalex:" + "|".join(ch), "select": META_SELECT, "per-page": 50}, mailto)
+        d = get("works", {"filter": "openalex:" + "|".join(ch), "select": META_SELECT, "per_page": 100}, api_key)
         for w in d["results"]:
             c = compact(w, keep_refs=False)
             refs[c["id"]] = c
 
     progress("Analyzing…", 0.99)
-    return {"author_ids": ids, "label": label or ", ".join(ids), "mailto": mailto, "my": my,
+    return {"author_ids": ids, "label": label or ", ".join(ids), "api_key": api_key, "my": my,
             "citing": citing, "refs": refs, "warnings": warnings}
 
 
@@ -401,19 +413,19 @@ def target_metrics(D, m):
     return paper_metrics(cited, sets, _ref_author_set(D["refs"], D["my"][m]["refs"]))
 
 
-def baseline_metrics(b, mailto="", cap=300):
-    items, _ = fetch_all("works", {"filter": f"cites:{b['id']}", "select": "id,authorships"}, cap, mailto)
+def baseline_metrics(b, api_key="", cap=300):
+    items, _ = fetch_all("works", {"filter": f"cites:{b['id']}", "select": "id,authorships"}, cap, api_key)
     sets = [{a for a, _ in compact(w, keep_refs=False)["authors"]} for w in items]
     refs_meta = {}
-    for ch in chunked(b["refs"][:200], 50):
-        d = get("works", {"filter": "openalex:" + "|".join(ch), "select": "id,authorships", "per-page": 50}, mailto)
+    for ch in chunked(b["refs"][:200], 100):
+        d = get("works", {"filter": "openalex:" + "|".join(ch), "select": "id,authorships", "per_page": 100}, api_key)
         for w in d["results"]:
             c = compact(w, keep_refs=False)
             refs_meta[c["id"]] = c
     return paper_metrics({a for a, _ in b["authors"]}, sets, _ref_author_set(refs_meta, b["refs"][:200]))
 
 
-def pick_baseline(t, exclude_ids, me, mailto, k, seed):
+def pick_baseline(t, exclude_ids, me, api_key, k, seed):
     """Random papers of the same type / year / subfield with a similar citation count."""
     c = t["cited_by"]
     lo, hi = max(int(c * 0.5) - 1, 0), int(math.ceil(c * 2)) + 1
@@ -428,7 +440,7 @@ def pick_baseline(t, exclude_ids, me, mailto, k, seed):
     for scope in scopes:
         try:
             d = get("works", {"filter": f"{scope},{base}", "sample": k * 4, "seed": seed,
-                              "per-page": min(k * 4, 200), "select": WORK_SELECT}, mailto)
+                              "per_page": min(k * 4, 100), "select": WORK_SELECT}, api_key)
         except Exception:
             continue
         picked = []
@@ -460,7 +472,7 @@ def _reading(n, lo, hi):
     return "Not distinguishable from baseline"
 
 
-def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1, mailto="",
+def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1, api_key="",
                   progress=lambda msg, frac: None):
     me, my = set(D["author_ids"]), D["my"]
     eligible = [m for m, v in my.items()
@@ -474,8 +486,8 @@ def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1,
         tm = target_metrics(D, m)
         if tm is None:
             continue
-        bl = pick_baseline(my[m], set(my) | used_baseline, me, mailto, k_base, seed + i)
-        bms = [bm for bm in (baseline_metrics(b, mailto) for b in bl) if bm]
+        bl = pick_baseline(my[m], set(my) | used_baseline, me, api_key, k_base, seed + i)
+        bms = [bm for bm in (baseline_metrics(b, api_key) for b in bl) if bm]
         used_baseline |= {b["id"] for b in bl}
         if len(bms) < 2:
             continue

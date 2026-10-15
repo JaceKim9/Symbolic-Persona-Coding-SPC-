@@ -55,8 +55,18 @@ def hide_id(df):
 # ───────────────────────── Sidebar ─────────────────────────
 with st.sidebar:
     st.header("Settings")
-    mailto = st.text_input("Email (optional)",
-                           help="Used for OpenAlex's 'polite pool': looser rate limits and more stable requests.")
+    api_key = st.text_input("OpenAlex API key", type="password",
+                            help="Required by OpenAlex since 2026. Free at openalex.org/settings/api (about $1 of usage per day).")
+    if not api_key:
+        try:
+            api_key = st.secrets.get("OPENALEX_API_KEY", "")
+        except Exception:
+            api_key = ""
+        if api_key:
+            st.caption("Using the key from this app's secrets.")
+        else:
+            st.warning("No API key: OpenAlex only allows a tiny shared free budget without one, so requests will "
+                       "most likely fail. Get a free key at openalex.org/settings/api.")
     max_works = st.slider("Max works", 50, 1000, 500, 50)
     max_citing = st.slider("Max citing papers to collect", 500, 10000, 4000, 500)
     max_refs = st.slider("Max reference records to collect", 500, 6000, 3000, 500)
@@ -77,7 +87,7 @@ if submitted and q.strip():
         st.session_state.pop(key, None)
     try:
         with st.spinner("Searching…"):
-            items = core.search_works(q, mailto) if mode == "Paper title / DOI" else core.search_authors(q, mailto)
+            items = core.search_works(q, api_key) if mode == "Paper title / DOI" else core.search_authors(q, api_key)
         st.session_state["search"] = {"mode": mode, "items": items}
     except Exception as e:
         st.session_state.pop("search", None)
@@ -99,13 +109,16 @@ if S:
         ai = st.multiselect("Author profile(s) to analyze (select several if one person is split across profiles)",
                             range(len(its)), default=[0], format_func=lambda i: its[i]["label"])
         chosen = [{"id": its[i]["id"], "name": its[i]["name"]} for i in ai]
+        if any(its[i].get("works", 0) > 300 for i in ai):
+            st.warning("A selected profile has 300+ works. Common names are often merged from several different "
+                       "people in OpenAlex, which distorts every metric. Searching by ORCID is more reliable.")
 
     if chosen and st.button("Start analysis", type="primary"):
         st.session_state.pop("B", None)
         bar = st.progress(0.0, text="Starting…")
         try:
             D = core.build_dataset(
-                [c["id"] for c in chosen], label=" + ".join(c["name"] for c in chosen), mailto=mailto,
+                [c["id"] for c in chosen], label=" + ".join(c["name"] for c in chosen), api_key=api_key,
                 max_works=max_works, max_citing=max_citing, max_refs=max_refs,
                 progress=lambda msg, f: bar.progress(min(max(f, 0.0), 1.0), text=msg))
             st.session_state["D"] = D
@@ -279,16 +292,15 @@ with tab_bench:
     k_base = c[1].slider("Baseline papers per paper", 2, 6, 3)
     lo_hi = c[2].slider("Cited-by range of tested papers", 5, 500, (10, 300))
     seed = c[3].number_input("Random seed", 1, 9999, 1)
-    st.caption(f"Roughly {n_target * k_base * 4} API requests (about {max(1, n_target * k_base * 4 // 120)}–"
-               f"{max(2, n_target * k_base * 4 // 40)} min on first run; repeats are cached). "
-               "Papers need at least 8 citing papers to be measured.")
+    st.caption(f"Roughly {n_target * k_base * 3} API calls (well under $0.05 of your free daily OpenAlex budget; "
+               "a few minutes on the first run, repeats are cached). Papers need at least 8 citing papers to be measured.")
 
     if st.button("Run benchmark", type="primary"):
         bar = st.progress(0.0, text="Starting…")
         try:
             st.session_state["B"] = core.run_benchmark(
                 D, n_target=n_target, k_base=k_base, min_cites=lo_hi[0], max_cites=lo_hi[1], seed=int(seed),
-                mailto=D.get("mailto", ""), progress=lambda msg, f: bar.progress(min(max(f, 0.0), 1.0), text=msg))
+                api_key=D.get("api_key", ""), progress=lambda msg, f: bar.progress(min(max(f, 0.0), 1.0), text=msg))
         except Exception as e:
             st.error(f"Benchmark failed: {e}")
         bar.empty()
