@@ -7,6 +7,7 @@ import json
 import math
 import random
 import re
+import textwrap
 import time
 from collections import Counter, defaultdict
 from functools import lru_cache
@@ -165,7 +166,8 @@ def build_dataset(author_ids, label="", api_key="", max_works=500, max_citing=40
     warnings = []
 
     progress("Collecting the author's works…", 0.02)
-    raw, total = fetch_all("works", {"filter": "author.id:" + "|".join(ids), "select": WORK_SELECT},
+    raw, total = fetch_all("works", {"filter": "author.id:" + "|".join(ids), "select": WORK_SELECT,
+                            "sort": "cited_by_count:desc"},
                            max_works, api_key)
     if total > len(raw):
         warnings.append(f"Collected {len(raw)} of {total} works (raise the limit in the sidebar).")
@@ -472,8 +474,9 @@ def _reading(n, lo, hi):
     return "Not distinguishable from baseline"
 
 
-def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1, api_key="",
-                  progress=lambda msg, frac: None):
+def collect_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1, api_key="",
+                      progress=lambda msg, frac: None):
+    """Network-heavy part: sample your papers, draw matched baselines, measure everything."""
     me, my = set(D["author_ids"]), D["my"]
     eligible = [m for m, v in my.items()
                 if min_cites <= v["cited_by"] <= max_cites and v["year"] and (v["subfield"] or v["field"])]
@@ -492,8 +495,13 @@ def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1,
         if len(bms) < 2:
             continue
         per_work.append({"id": m, "t": tm, "b": bms})
+    return per_work, len(eligible), len(sample), len(used_baseline)
 
-    rows, summ = [], []
+
+def summarize_benchmark(D, per_work, n_eligible, n_sampled, n_baseline, seed=1):
+    """Pure computation: per-paper table, long table (for charts), summary with bootstrap CI."""
+    my = D["my"]
+    rows, long_rows, summ = [], [], []
     for w in per_work:
         v = my[w["id"]]
         row = {"Year": v["year"], "Title": v["title"], "Cited by": v["cited_by"], "Baseline papers": len(w["b"])}
@@ -501,9 +509,15 @@ def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1,
             bv = [b[key] for b in w["b"] if b[key] is not None]
             tv = w["t"][key]
             short = name.replace(" %", "")
+            base_mean = round(sum(bv) / len(bv), 1) if bv else None
+            pct = round(_pct_rank(tv, bv)) if (tv is not None and len(bv) >= 2) else None
             row[f"{short}: yours"] = None if tv is None else round(tv, 1)
-            row[f"{short}: baseline"] = round(sum(bv) / len(bv), 1) if bv else None
-            row[f"{short}: percentile"] = round(_pct_rank(tv, bv)) if (tv is not None and len(bv) >= 2) else None
+            row[f"{short}: baseline"] = base_mean
+            row[f"{short}: percentile"] = pct
+            if tv is not None and base_mean is not None:
+                long_rows.append({"Metric": name, "Title": core_trunc(v["title"], 80), "Year": v["year"],
+                                  "Yours": round(tv, 1), "Baseline": base_mean,
+                                  "Difference": round(tv - base_mean, 1), "Percentile": pct})
         rows.append(row)
 
     np_rng = np.random.default_rng(seed)
@@ -527,9 +541,17 @@ def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1,
                      "95% CI low": round(lo, 1), "95% CI high": round(hi, 1),
                      "Mean percentile": round(p_arr.mean()), "Reading": _reading(len(pairs), lo, hi)})
 
+    long_cols = ["Metric", "Title", "Year", "Yours", "Baseline", "Difference", "Percentile"]
     return {"summary_df": pd.DataFrame(summ), "papers_df": pd.DataFrame(rows),
-            "n_eligible": len(eligible), "n_sampled": len(sample), "n_used": len(per_work),
-            "n_baseline": len(used_baseline)}
+            "long_df": pd.DataFrame(long_rows, columns=long_cols),
+            "n_eligible": n_eligible, "n_sampled": n_sampled, "n_used": len(per_work),
+            "n_baseline": n_baseline}
+
+
+def run_benchmark(D, n_target=20, k_base=3, min_cites=10, max_cites=300, seed=1, api_key="",
+                  progress=lambda msg, frac: None):
+    per_work, ne, ns, nb = collect_benchmark(D, n_target, k_base, min_cites, max_cites, seed, api_key, progress)
+    return summarize_benchmark(D, per_work, ne, ns, nb, seed)
 
 
 # ───────────────────────── Graphs ─────────────────────────
@@ -537,20 +559,33 @@ def trunc(s, n):
     return s if len(s) <= n else s[:n - 1] + "…"
 
 
+core_trunc = trunc
+
+
 def _tip(v, kind=None):
-    t = f"{v['title']}\n{fmt_authors(v['authors'], 5)}\n{v['year']} · cited by {v['cited_by']}"
+    t = f"{textwrap.fill(v['title'], 70)}\n{fmt_authors(v['authors'], 5)}\n{v['year']} · cited by {v['cited_by']}"
     return t + (f"\n[{kind}]" if kind else "")
 
 
-def paper_graph(D, A, m, k=25):
+def node_label(v, style="short"):
+    """Short node label: 'Surname et al., 2021' (+ a short title unless style == 'compact'). Full title is in the tooltip."""
+    au = v["authors"][0][1].split()[-1] if v["authors"] else "?"
+    if len(v["authors"]) > 1:
+        au += " et al."
+    head = f"{au}, {v['year']}"
+    return head if style == "compact" else f"{head}\n{trunc(v['title'], 34)}"
+
+
+def paper_graph(D, A, m, k=15, label_style="short"):
     """Left: papers citing this one -> center: selected paper -> right: papers it cites."""
     my, citing, refs = D["my"], D["citing"], D["refs"]
     my_ids, mutual = set(my), A["mutual_ids"]
     kmap = A["kind_map"].get(m, {})
+    box = {"shape": "box", "widthConstraint": {"maximum": 190}, "margin": 6}
 
-    nodes = [{"id": "center", "label": trunc(my[m]["title"], 50), "title": _tip(my[m]), "shape": "box",
-              "level": 1, "color": {"background": "#fbbf24", "border": "#b45309"},
-              "font": {"size": 16, "color": "#111"}, "widthConstraint": {"maximum": 280}}]
+    nodes = [{"id": "center", "label": trunc(my[m]["title"], 60), "title": _tip(my[m]), "level": 1,
+              "color": {"background": "#fbbf24", "border": "#b45309"}, "font": {"size": 15, "color": "#111"},
+              "shape": "box", "widthConstraint": {"maximum": 240}, "margin": 8}]
     edges = []
 
     cl = sorted(((cid, c) for cid, c in citing.items() if m in c["hits"]),
@@ -559,11 +594,9 @@ def paper_graph(D, A, m, k=25):
         kind = kmap[cid]
         mut = any(a in mutual for a, _ in c["authors"])
         col = KIND_COLOR[kind]
-        nodes.append({"id": "c_" + cid, "label": f"{trunc(c['title'], 45)}\n({c['year']})",
-                      "title": _tip(c, kind), "shape": "box", "level": 0,
+        nodes.append({"id": "c_" + cid, "label": node_label(c, label_style), "title": _tip(c, kind), "level": 0,
                       "color": {"background": col, "border": "#7c3aed" if mut else col},
-                      "borderWidth": 4 if mut else 1, "font": {"color": "#fff", "size": 12},
-                      "widthConstraint": {"maximum": 240}})
+                      "borderWidth": 4 if mut else 1, "font": {"color": "#fff", "size": 11}, **box})
         edges.append({"from": "c_" + cid, "to": "center"})
 
     rl = sorted((refs[r] for r in my[m]["refs"] if r in refs),
@@ -572,27 +605,57 @@ def paper_graph(D, A, m, k=25):
         mine = v["id"] in my_ids
         mut = any(a in mutual for a, _ in v["authors"])
         col = "#10b981" if mine else "#9ca3af"
-        nodes.append({"id": "r_" + v["id"], "label": f"{trunc(v['title'], 45)}\n({v['year']})",
-                      "title": _tip(v, "my other work" if mine else None), "shape": "box", "level": 2,
+        nodes.append({"id": "r_" + v["id"], "label": node_label(v, label_style),
+                      "title": _tip(v, "my other work" if mine else None), "level": 2,
                       "color": {"background": col, "border": "#7c3aed" if mut else col},
-                      "borderWidth": 4 if mut else 1, "font": {"color": "#fff" if mine else "#111", "size": 12},
-                      "widthConstraint": {"maximum": 240}})
+                      "borderWidth": 4 if mut else 1, "font": {"color": "#fff" if mine else "#111", "size": 11},
+                      **box})
         edges.append({"from": "center", "to": "r_" + v["id"]})
     return nodes, edges, max(len(cl) - k, 0), max(len(rl) - k, 0)
 
 
-def author_graph(D, A, k=15):
+def author_graph(D, A, k=15, layout="force", hide_coauthors=False):
+    """Author-level network. layout: 'force' (physics), 'radial' (rings) or 'lr' (citers -> me -> cited)."""
     inc, out, names, coauth = A["inc"], A["out"], A["names"], A["coauthors"]
-    ids = list(dict.fromkeys([a for a, _ in inc.most_common(k)] + [a for a, _ in out.most_common(k)]))
-    nodes = [{"id": "me", "label": D["label"], "shape": "star", "size": 32,
-              "color": {"background": "#fbbf24", "border": "#b45309"}, "font": {"size": 16}}]
-    edges = []
+    keep = (lambda a: a not in coauth) if hide_coauthors else (lambda a: True)
+    top_in = [a for a, _ in inc.most_common() if keep(a)][:k]
+    top_out = [a for a, _ in out.most_common() if keep(a)][:k]
+    ids = list(dict.fromkeys(top_in + top_out))
+
+    kinds = {}
     for a in ids:
         i, o = inc.get(a, 0), out.get(a, 0)
-        col = "#ef4444" if (i and o) else ("#3b82f6" if i else "#10b981")
-        nodes.append({"id": a, "label": names.get(a, a), "shape": "diamond" if a in coauth else "dot",
-                      "size": 10 + 4 * math.sqrt(i + o), "color": col,
-                      "title": f"{names.get(a, a)}\ncites me {i}x · I cite them {o}x" + ("\nco-author" if a in coauth else "")})
+        kinds[a] = "both" if (i and o) else ("in" if i else "out")
+    groups = {g: [a for a in ids if kinds[a] == g] for g in ("in", "out", "both")}
+
+    pos = {}
+    if layout == "radial":
+        def ring(items, radius, a0, a1):
+            n = len(items)
+            for j, a in enumerate(items):
+                t = a0 + (a1 - a0) * (j + 0.5) / max(n, 1)
+                pos[a] = (radius * math.cos(math.radians(t)), radius * math.sin(math.radians(t)))
+        ring(groups["both"], 170, 0, 360)
+        ring(groups["in"], max(340, 16 * len(groups["in"])), 100, 260)
+        ring(groups["out"], max(340, 16 * len(groups["out"])), -80, 80)
+
+    nodes = [{"id": "me", "label": trunc(D["label"], 30), "shape": "star", "size": 32,
+              "color": {"background": "#fbbf24", "border": "#b45309"}, "font": {"size": 16}, "level": 1,
+              **({"x": 0, "y": 0} if layout == "radial" else {})}]
+    edges = []
+    palette = {"in": "#3b82f6", "out": "#10b981", "both": "#ef4444"}
+    for a in ids:
+        i, o = inc.get(a, 0), out.get(a, 0)
+        is_co = a in coauth
+        n = {"id": a, "label": ("◆ " if is_co else "") + trunc(names.get(a, a), 22),
+             "shape": "diamond" if is_co else "dot", "size": 10 + 4 * math.sqrt(i + o),
+             "color": {"background": palette[kinds[a]], "border": "#111" if is_co else palette[kinds[a]]},
+             "borderWidth": 3 if is_co else 1,
+             "title": f"{names.get(a, a)}\ncites me {i}x · I cite them {o}x" + ("\nco-author" if is_co else ""),
+             "level": 2 if kinds[a] == "out" else 0}
+        if layout == "radial":
+            n["x"], n["y"] = pos[a]
+        nodes.append(n)
         if i:
             edges.append({"from": a, "to": "me", "label": str(i), "width": 1 + math.log2(i + 1), "color": "#3b82f6"})
         if o:
