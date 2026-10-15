@@ -7,7 +7,7 @@ This directory contains the experiment harnesses for evaluating **Symbolic Perso
 ## 1. Supported Models and API Providers
 * **Claude Harness (`claud_spc_harness.py`)**: Designed for Anthropic Claude models using the official `anthropic` Python SDK.
 * **Gemini Harness (`gemini_spc_harness.py`)**: Designed for Google Gemini models using the official `google-genai` SDK.
-* **Grok / OpenAI-Compatible Harness (`spc_harness_grok_gpt.py`)**: Designed for xAI Grok and any OpenAI-compatible endpoints using Python's built-in `urllib` (zero external dependencies for API calls).
+* **Grok / OpenAI-Compatible Harness (`spc_harness_grok_openai.py`)**: Designed for xAI Grok and any OpenAI-compatible endpoints using Python's built-in `urllib` (zero external dependencies for API calls).
 
 ---
 
