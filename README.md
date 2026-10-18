@@ -22,6 +22,9 @@ https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20J
 https://medium.com/@jk1849716
 
 Published Papers
+Kim, J. H. (2026). The Vanishing Ground: Link Rot and Web-Grounded AI
+Zenodo. https://doi.org/10.5281/zenodo.23444680
+
 Kim, J. H. (2026). Moral Uncertainty in AI Welfare Research: A Framework
 Zenodo. https://doi.org/10.5281/zenodo.23289757
 
