@@ -140,7 +140,7 @@ For every evaluation, record: the repository URL and exact Git commit or release
 
 ## 9. Provenance
 
-Experimental design version: 0.1 (pilot; six tasks; conditions C0–C6). The harness code was developed with AI assistance and has not been independently audited. See the accompanying paper for the full protocol, scope, and limitations.
+Experimental design version: 0.1 (pilot; six tasks; conditions C0–C6).
 
 ## 10. License
 
