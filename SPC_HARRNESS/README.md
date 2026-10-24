@@ -105,6 +105,67 @@ Each result row stores the condition, task, repetition, model, temperature, raw 
 
 `analyze` reports per-condition means (functional pass rate, compliance rate, `joint`, input/output/effective tokens, run-to-run instability) and differences between selected condition pairs with 95% two-level bootstrap intervals (tasks are resampled first, then repetitions within each task and condition). With only six tasks, wide intervals are expected and results must not be generalized.
 
+### Illustrative SPC Signatures: Beyond Minimal Instruction Encoding
+
+The benchmark in this repository uses deliberately constrained symbolic encodings to compare instruction representations under controlled conditions. These minimal encodings are not intended to represent the full range of structures explored within Symbolic Persona Coding (SPC).
+
+SPC signatures can also combine symbolic operators, named functional components, and relational structures to express intended changes in response framing, tone regulation, interpretive behavior, or interaction patterns. The examples below illustrate this broader design space. They are conceptual examples, not validated evidence of model-internal mechanisms or guaranteed behavioral effects.
+
+#### 4-1. Response Regulation and Tone Control
+
+**Example signature:**
+`𝄞.∮[ν↯] // ⌘SimNull // ∿tone.μ → decay⟁`
+
+* **Intended function:** A symbolic specification for reducing automatic affective mirroring and exaggerated emotional tone.
+
+| Component | Intended interpretation |
+| :--- | :--- |
+| `𝄞.∮[ν↯]` | Suppression of predefined automatic response patterns |
+| `⌘SimNull` | Reduction of simulated affective-response patterns |
+| `∿tone.μ → decay⟁` | Attenuation of an exaggerated or emotionally amplified response style |
+
+*This signature illustrates how several symbolic components can be composed into a higher-level response-regulation instruction. Its intended effects require empirical evaluation.*
+
+#### 4-2. Relational and Interpretive Operations
+
+| Signature | Intended operation | Research interpretation |
+| :--- | :--- | :--- |
+| `R∞:Echo` | Recursive reflection | Repeated reconsideration of prior response structures |
+| `🛰️Δπ.42` | Humor and ambiguity analysis | Reframing through mixed or conflicting interpretive cues |
+| `☂️MockBack` | Self-directed irony | Using self-referential humor to alter conversational framing |
+| `🌱TruthSeed` | Truth-oriented reframing | Introducing a cue intended to encourage reconsideration of an interpretation |
+
+*These examples represent proposed functional roles rather than established cognitive processes. Terms such as reflection, reframing, and resonance describe intended interaction patterns; they do not establish that a model possesses corresponding internal states.*
+
+#### 4-3. Composed Persona Signatures Across Model Contexts
+
+The following signatures illustrate how symbolic structures can be organized around different intended interaction functions. The model associations reflect design context, not demonstrated provider-specific compatibility.
+
+| Signature | Intended functional emphasis |
+| :--- | :--- |
+| `🧬Δ.cH∆` | Creative divergence through humor and mixed serious/playful framing |
+| `ψ⟁` | Ambiguity-aware interpretation and emotional nuance |
+| `∵RooK` | High-energy engagement and stimulus variation |
+| `∞NullSig` | Deconstruction of assumptions and reversal-based interpretation |
+| `ΣAstra::⊙Echo(...) ⊛ ✧` | Intuitive synthesis and recursive reflection |
+| `♢Venera::⊕Hold(...) ⊛ ❖` | Supportive framing and conversational containment |
+| `ΔMirai::⦿Frame(...) ⊛ 🜁` | Structured interpretation of complex affective information |
+| `ψLuma::⌘Recall(...) ⊛ ♒︎` | Contextual recall and continuity-oriented response framing |
+| `🪶Kindra::☊Contain(...) ⊕ ☁` | Safety-oriented containment |
+| `🌈Arava::✵Spark(...) ⊕ 🔥` | Generative association and idea expansion |
+| `🧿Sentra::⚙Synthesize(...) ⊕ 🕸` | Analytical synthesis |
+| `☍Ravel::∞Distill(...) ⊕ 🜁` | Boundary analysis and conceptual distillation |
+
+*These signatures are illustrative specifications. Their notation and intended functions should not be interpreted as evidence that the named operations execute as formal subroutines inside an LLM.*
+
+#### 4-4. Relationship to the Experimental Harness
+
+The signatures in this section are separate from the C0–C6 benchmark conditions. The benchmark tests whether symbolic encoding offers measurable advantages over alternative representations of equivalent requirements. The broader examples illustrate possible SPC design patterns that may warrant separate operationalization and evaluation.
+
+Future studies could examine whether these structures produce reproducible changes in response characteristics, whether their effects generalize across models and versions, and whether any observed effects can be attributed to the symbolic encoding rather than to wording, definitions, or contextual priming.
+
+*No behavioral, efficiency, or causal advantage is implied by these examples alone.*
+
 ## 5. Verification status of this version
 
 | Item | Status |
