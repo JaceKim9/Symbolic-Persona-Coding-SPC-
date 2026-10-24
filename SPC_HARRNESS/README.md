@@ -10,7 +10,7 @@ Experiment harnesses for evaluating **Symbolic Persona Coding (SPC)** as an inst
 
 | File | Provider | Client dependency |
 |---|---|---|
-| `claud_spc_harness.py` | Anthropic Claude | `anthropic` |
+| `claude_spc_harness.py` | Anthropic Claude | `anthropic` |
 | `gemini_spc_harness.py` | Google Gemini | `google-genai` |
 | `spc_harness_grok_openai.py` | xAI Grok and any OpenAI-compatible endpoint | none (standard-library `urllib`) |
 
