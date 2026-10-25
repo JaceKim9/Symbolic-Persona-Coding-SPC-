@@ -7,11 +7,10 @@ Layer 3  AES-256    (USA,    FIPS 197)            GCM mode (authenticates everyt
 
 One passphrase -> scrypt -> HKDF -> three independent keys. No cipher internals are
 mixed or modified: each layer is a standard algorithm used as specified.
-Run `python tricascade.py` to open the local app. Nothing leaves your computer.
 """
-import argparse, base64, getpass, hashlib, json, math, os, secrets, sys, threading
-import unicodedata, webbrowser
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import argparse, base64, getpass, hashlib, math, os, secrets, sys
+import unicodedata
+import streamlit as st
 
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import hashes
@@ -172,136 +171,123 @@ def selftest():
     return res
 
 
-# ---------- local web app ----------
-PAGE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>TriCascade</title><style>
-:root{--bg:#eef1f4;--panel:#fff;--ink:#15212b;--mute:#566470;--line:#c9d2da;--l1:#2f5d8a;--l2:#a2453b;--l3:#2d6a4f;--btn:#15212b;--btnt:#fff;color-scheme:light}
-@media(prefers-color-scheme:dark){:root{--bg:#10171d;--panel:#18222b;--ink:#e6edf2;--mute:#97a6b2;--line:#2c3a46;--l1:#7fb0e0;--l2:#e08a80;--l3:#7fcfa6;--btn:#e6edf2;--btnt:#10171d;color-scheme:dark}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:760px;margin:0 auto;padding:28px 18px 60px}h1{font:700 2rem/1.1 Georgia,"Times New Roman",serif;margin:0 0 6px}
-.sub{color:var(--mute);margin:0 0 22px;max-width:60ch}nav{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:20px}
-nav button{background:none;border:0;border-bottom:3px solid transparent;color:var(--mute);font:inherit;padding:8px 12px;cursor:pointer}
-nav button[aria-selected=true]{color:var(--ink);border-color:var(--ink);font-weight:600}
-section{display:none}section.on{display:block}label{display:block;font-weight:600;margin:14px 0 4px}
-textarea,input{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px;font:inherit}
-textarea{min-height:130px;resize:vertical}.mono{font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
-.row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}button.b{background:var(--btn);color:var(--btnt);border:0;border-radius:6px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
-button.b.alt{background:none;color:var(--ink);border:1px solid var(--ink)}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--l1);outline-offset:2px}
-.out{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;min-height:60px;white-space:pre-wrap;margin-top:6px}
-.err{color:var(--l2);font-weight:600}.hint{color:var(--mute);font-size:.9rem}
-.layers{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}.layers div{flex:1 1 150px;border-left:6px solid;padding:6px 10px;background:var(--panel);border-radius:0 6px 6px 0;font-size:.9rem}
-.layers b{display:block}.t{padding:8px 0;border-bottom:1px solid var(--line)}.ok{color:var(--l3);font-weight:700}.no{color:var(--l2);font-weight:700}
-h2{font-size:1.15rem;margin:22px 0 6px}code{background:var(--panel);padding:1px 5px;border-radius:4px}
-</style></head><body><main>
-<h1>TriCascade</h1><p class="sub">Lock a message with three national cipher standards at once, using one passphrase. Everything runs on this computer.</p>
-<nav role="tablist"><button aria-selected="true" data-t="lock">Lock and unlock</button><button aria-selected="false" data-t="gen">Password maker</button><button aria-selected="false" data-t="how">How it works</button><button aria-selected="false" data-t="test">Self-test</button></nav>
-<section id="lock" class="on"><label for="msg">Message or locked text</label><textarea id="msg" placeholder="Type a message to lock, or paste locked text to unlock."></textarea>
-<label for="pw">Passphrase</label><input id="pw" type="password" autocomplete="off"><p class="hint" id="rate"></p>
-<div class="row"><button class="b" id="bl">Lock message</button><button class="b alt" id="bu">Unlock message</button></div>
-<div class="layers" id="layers" hidden></div><label>Result</label><div class="out mono" id="res" aria-live="polite"></div>
-<div class="row"><button class="b alt" id="cp">Copy result</button></div></section>
-<section id="gen"><p>Random passphrases are easy to say and hard to guess. Use one as your lock passphrase, and store it in a password manager.</p>
-<div class="row"><button class="b" id="g1">New passphrase</button><button class="b alt" id="g2">New password</button></div><div class="out mono" id="gout"></div><p class="hint" id="gbits"></p></section>
-<section id="how"><h2>Three layers, three keys</h2><p>Your passphrase is stretched with <code>scrypt</code>, then split by HKDF into three unrelated keys. Your message passes through:</p>
-<div class="layers"><div style="border-color:var(--l1)"><b>Layer 1: Kuznyechik</b>Russia, GOST R 34.12-2015</div><div style="border-color:var(--l2)"><b>Layer 2: SM4</b>China, GB/T 32907-2016</div><div style="border-color:var(--l3)"><b>Layer 3: AES-256-GCM</b>USA, FIPS 197</div></div>
-<p>The outer AES layer also seals the whole package, so any changed character is caught before unlocking starts. Messages are padded so their exact length is blurred.</p>
-<h2>What this is good for</h2><p>Notes, recovery codes, and messages you send over ordinary chat or email, where both people know the passphrase. Share the passphrase another way, such as in person or by phone.</p>
-<h2>What it cannot do</h2><p>It cannot protect a weak passphrase, a device with malware, or someone who looks over your shoulder. It has no forward secrecy, and it does not prove who sent a message. The code is open but has not had an independent security audit, so do not use it for life-or-death secrets. Check that encryption software is legal where you live.</p></section>
-<section id="test"><p>Checks each cipher against published test vectors, then tries a round trip, a wrong passphrase, and a tampered message.</p>
-<div class="row"><button class="b" id="rt">Run self-test</button></div><div id="tout"></div></section>
-</main><script>
-const T="__TOKEN__",$=s=>document.querySelector(s);
-const api=async(p,b)=>(await fetch("/api/"+p,{method:"POST",headers:{"Content-Type":"application/json","X-TC-Token":T},body:JSON.stringify(b||{})})).json();
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x==b));
-document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id==b.dataset.t))});
-const show=(r,ok)=>{$("#res").className="out mono"+(ok?"":" err");$("#res").textContent=r};
-async function go(kind){const text=$("#msg").value,password=$("#pw").value;$("#layers").hidden=true;
-if(!text||!password){show("Enter a message and a passphrase first.",false);return}
-show("Working...",true);const r=await api(kind,{text,password});if(r.error){show(r.error,false);return}
-show(r.result,true);if(r.sizes){const n=["Layer 1: Kuznyechik","Layer 2: SM4","Layer 3: AES-256-GCM"],c=["--l1","--l2","--l3"];
-$("#layers").innerHTML=n.map((x,i)=>`<div style="border-color:var(${c[i]})"><b>${x}</b>${r.sizes[i+1]} bytes</div>`).join("");$("#layers").hidden=false}}
-$("#bl").onclick=()=>go("lock");$("#bu").onclick=()=>go("unlock");
-$("#pw").oninput=async e=>{$("#rate").textContent=e.target.value?(await api("rate",{password:e.target.value})).result:""};
-$("#cp").onclick=async()=>{await navigator.clipboard.writeText($("#res").textContent);$("#cp").textContent="Copied";setTimeout(()=>$("#cp").textContent="Copy result",1500)};
-const gen=async k=>{const r=await api(k);$("#gout").textContent=r.result;$("#gbits").textContent="About "+r.bits+" bits of randomness."};
-$("#g1").onclick=()=>gen("passphrase");$("#g2").onclick=()=>gen("password");
-$("#rt").onclick=async()=>{$("#tout").textContent="Running...";const r=await api("selftest");
-$("#tout").innerHTML=r.results.map(x=>`<div class="t"><span class="${x.ok?"ok":"no"}">${x.ok?"Pass":"Fail"}</span> ${x.name}</div>`).join("")};
-</script></body></html>"""
+# ---------- Streamlit Web App UI ----------
+def run_streamlit_app():
+    st.set_page_config(page_title="TriCascade", page_icon="🔐", layout="centered")
+    st.title("TriCascade")
+    st.markdown("Lock a message with three national cipher standards at once, using one passphrase. Everything runs securely.")
 
+    tabs = st.tabs(["Lock and unlock", "Password maker", "How it works", "Self-test"])
 
-def run_app(open_browser=True):
-    token = secrets.token_urlsafe(24)
-    class Handler(BaseHTTPRequestHandler):
-        def log_message(self, *a): pass
-        def _host_ok(self):
-            return self.headers.get("Host", "") in (f"127.0.0.1:{self.server.server_port}", f"localhost:{self.server.server_port}")
-        def _send(self, code, body, ctype="application/json"):
-            data = body.encode() if isinstance(body, str) else body
-            self.send_response(code); self.send_header("Content-Type", ctype + "; charset=utf-8")
-            self.send_header("Content-Length", str(len(data))); self.send_header("Cache-Control", "no-store")
-            self.send_header("Content-Security-Policy", "default-src 'self' 'unsafe-inline'"); self.end_headers(); self.wfile.write(data)
-        def do_GET(self):
-            if self.path == "/" and self._host_ok():
-                self._send(200, PAGE.replace("__TOKEN__", token), "text/html")
+    with tabs[0]:
+        msg = st.text_area("Message or locked text", placeholder="Type a message to lock, or paste locked text to unlock.")
+        pw = st.text_input("Passphrase", type="password", autocomplete="off")
+        
+        if pw:
+            st.caption(f"Password strength: {rate(pw)}")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            lock_btn = st.button("Lock message", use_container_width=True)
+        with col2:
+            unlock_btn = st.button("Unlock message", use_container_width=True)
+
+        if lock_btn:
+            if not msg or not pw:
+                st.error("Enter a message and a passphrase first.")
             else:
-                self._send(404, "{}")
-        def do_POST(self):
-            if not self._host_ok() or self.headers.get("X-TC-Token") != token:
-                return self._send(403, "{}")
-            try:
-                d = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)) or 0) or b"{}")
-                route, pw = self.path[5:], d.get("password", "")
-                if route == "lock":
-                    text, sizes = lock_text(d["text"], pw); out = {"result": text, "sizes": sizes}
-                elif route == "unlock": out = {"result": unlock_text(d["text"], pw)}
-                elif route == "rate": out = {"result": rate(pw)}
-                elif route in ("passphrase", "password"):
-                    v, bits = make_passphrase() if route == "passphrase" else make_password(); out = {"result": v, "bits": bits}
-                elif route == "selftest": out = {"results": selftest()}
-                else: return self._send(404, "{}")
-            except DecryptError as e: out = {"error": str(e)}
-            except Exception: out = {"error": "Something went wrong. Check your input and try again."}
-            self._send(200, json.dumps(out))
-    srv = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-    url = f"http://127.0.0.1:{srv.server_port}/"
-    print(f"TriCascade is running at {url}\nPress Ctrl+C to stop.")
-    if open_browser:
-        threading.Timer(0.5, lambda: webbrowser.open(url)).start()
-    try: srv.serve_forever()
-    except KeyboardInterrupt: print("\nStopped.")
+                try:
+                    text, sizes = lock_text(msg, pw)
+                    st.success("Message locked successfully!")
+                    st.code(text, language="text")
+                    st.markdown("**Layer sizes:**")
+                    st.markdown(f"- Layer 1 (Kuznyechik): {sizes[1]} bytes")
+                    st.markdown(f"- Layer 2 (SM4): {sizes[2]} bytes")
+                    st.markdown(f"- Layer 3 (AES-256-GCM): {sizes[3]} bytes")
+                except Exception as e:
+                    st.error(f"Error: {e}")
+
+        if unlock_btn:
+            if not msg or not pw:
+                st.error("Enter locked text and a passphrase first.")
+            else:
+                try:
+                    res = unlock_text(msg, pw)
+                    st.success("Message unlocked successfully!")
+                    st.code(res, language="text")
+                except DecryptError as e:
+                    st.error(f"Decryption error: {e}")
+                except Exception as e:
+                    st.error(f"Something went wrong: {e}")
+
+    with tabs[1]:
+        st.markdown("Random passphrases are easy to say and hard to guess. Use one as your lock passphrase, and store it in a password manager.")
+        col1, col2 = st.columns(2)
+        if col1.button("New passphrase", use_container_width=True):
+            v, bits = make_passphrase()
+            st.code(v)
+            st.caption(f"About {bits} bits of randomness.")
+        if col2.button("New password", use_container_width=True):
+            v, bits = make_password()
+            st.code(v)
+            st.caption(f"About {bits} bits of randomness.")
+
+    with tabs[2]:
+        st.subheader("Three layers, three keys")
+        st.markdown("Your passphrase is stretched with `scrypt`, then split by HKDF into three unrelated keys. Your message passes through:")
+        st.markdown("- **Layer 1: Kuznyechik** (Russia, GOST R 34.12-2015)")
+        st.markdown("- **Layer 2: SM4** (China, GB/T 32907-2016)")
+        st.markdown("- **Layer 3: AES-256-GCM** (USA, FIPS 197)")
+        st.markdown("The outer AES layer also seals the whole package, so any changed character is caught before unlocking starts.")
+
+    with tabs[3]:
+        st.markdown("Checks each cipher against published test vectors, then tries a round trip, a wrong passphrase, and a tampered message.")
+        if st.button("Run self-test", use_container_width=True):
+            results = selftest()
+            for r in results:
+                if r["ok"]:
+                    st.success(f"PASS: {r['name']}")
+                else:
+                    st.error(f"FAIL: {r['name']}")
 
 
-# ---------- command line ----------
+# ---------- command line & main ----------
 def main():
-    p = argparse.ArgumentParser(description="TriCascade: Kuznyechik + SM4 + AES-256 cascade.")
-    sub = p.add_subparsers(dest="cmd")
-    for name in ("lock", "unlock"):
-        s = sub.add_parser(name, help=f"{name} text (-t or stdin) or a file (-i/-o)")
-        s.add_argument("-t", "--text"); s.add_argument("-i", "--infile"); s.add_argument("-o", "--outfile")
-    g = sub.add_parser("gen", help="make a random passphrase or password"); g.add_argument("--password", action="store_true")
-    sub.add_parser("selftest", help="run built-in test vectors"); sub.add_parser("app", help="open the local web app (default)")
-    a = p.parse_args()
-    if a.cmd in (None, "app"): return run_app()
-    if a.cmd == "gen":
-        v, bits = make_password() if a.password else make_passphrase(); print(v); print(f"(about {bits} bits)", file=sys.stderr); return
-    if a.cmd == "selftest":
-        r = selftest()
-        for x in r: print(("PASS  " if x["ok"] else "FAIL  ") + x["name"])
-        sys.exit(0 if all(x["ok"] for x in r) else 1)
-    pw = getpass.getpass("Passphrase: ")
-    try:
-        if a.cmd == "lock" and a.infile:
-            blob, _ = lock_bytes(open(a.infile, "rb").read(), pw); open(a.outfile or a.infile + ".tc", "wb").write(blob)
-        elif a.cmd == "unlock" and a.infile:
-            data = unlock_bytes(open(a.infile, "rb").read(), pw)
-            if a.outfile: open(a.outfile, "wb").write(data)
-            else: sys.stdout.buffer.write(data)
-        else:
-            text = a.text if a.text is not None else sys.stdin.read()
-            print(lock_text(text, pw)[0] if a.cmd == "lock" else unlock_text(text, pw))
-    except DecryptError as e:
-        sys.exit(f"Error: {e}")
+    # 터미널 명령어(CLI) 모드로 실행한 경우
+    if len(sys.argv) > 1 and sys.argv[1] in ["lock", "unlock", "gen", "selftest"]:
+        p = argparse.ArgumentParser(description="TriCascade: Kuznyechik + SM4 + AES-256 cascade.")
+        sub = p.add_subparsers(dest="cmd")
+        for name in ("lock", "unlock"):
+            s = sub.add_parser(name, help=f"{name} text (-t or stdin) or a file (-i/-o)")
+            s.add_argument("-t", "--text"); s.add_argument("-i", "--infile"); s.add_argument("-o", "--outfile")
+        g = sub.add_parser("gen", help="make a random passphrase or password"); g.add_argument("--password", action="store_true")
+        sub.add_parser("selftest", help="run built-in test vectors")
+        a = p.parse_args()
+        
+        if a.cmd == "gen":
+            v, bits = make_password() if a.password else make_passphrase()
+            print(v); print(f"(about {bits} bits)", file=sys.stderr); return
+        if a.cmd == "selftest":
+            r = selftest()
+            for x in r: print(("PASS  " if x["ok"] else "FAIL  ") + x["name"])
+            sys.exit(0 if all(x["ok"] for x in r) else 1)
+        
+        pw = getpass.getpass("Passphrase: ")
+        try:
+            if a.cmd == "lock" and a.infile:
+                blob, _ = lock_bytes(open(a.infile, "rb").read(), pw); open(a.outfile or a.infile + ".tc", "wb").write(blob)
+            elif a.cmd == "unlock" and a.infile:
+                data = unlock_bytes(open(a.infile, "rb").read(), pw)
+                if a.outfile: open(a.outfile, "wb").write(data)
+                else: sys.stdout.buffer.write(data)
+            else:
+                text = a.text if a.text is not None else sys.stdin.read()
+                print(lock_text(text, pw)[0] if a.cmd == "lock" else unlock_text(text, pw))
+        except DecryptError as e:
+            sys.exit(f"Error: {e}")
+    else:
+        # Streamlit 앱으로 실행된 경우
+        run_streamlit_app()
 
 
 if __name__ == "__main__":
