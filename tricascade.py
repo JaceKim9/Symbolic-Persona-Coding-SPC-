@@ -173,7 +173,10 @@ def selftest():
 
 # ---------- Streamlit Web App UI ----------
 def run_streamlit_app():
-    st.set_page_config(page_title="TriCascade", page_icon="🔐", layout="centered")
+    st.set_page_config(page_title="TriCascade | SPC Research", page_icon="🔐", layout="centered")
+    
+    # 연구 시리즈 브랜딩 상단 노출
+    st.caption("SPC Research Series · Symbolic Persona Coding")
     st.title("TriCascade")
     st.markdown("Lock a message with three national cipher standards at once, using one passphrase. Everything runs securely.")
 
@@ -253,7 +256,6 @@ def run_streamlit_app():
 
 # ---------- command line & main ----------
 def main():
-    # 터미널 명령어(CLI) 모드로 실행한 경우
     if len(sys.argv) > 1 and sys.argv[1] in ["lock", "unlock", "gen", "selftest"]:
         p = argparse.ArgumentParser(description="TriCascade: Kuznyechik + SM4 + AES-256 cascade.")
         sub = p.add_subparsers(dest="cmd")
@@ -286,7 +288,6 @@ def main():
         except DecryptError as e:
             sys.exit(f"Error: {e}")
     else:
-        # Streamlit 앱으로 실행된 경우
         run_streamlit_app()
 
 
