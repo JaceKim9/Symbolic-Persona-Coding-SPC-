@@ -1,337 +1,72 @@
-# Symbolic Persona Coding SPC
+# TriCascade
 
-Independent researcher developing Symbolic Persona Coding (SPC) & Resonant Neural Re-Injection (RNRI). Central Zenodo index for all SPC research papers and DOIs.
+Lock text and files with **three national cipher standards at once**, using one passphrase.
+Everything runs on your own computer. Nothing is uploaded.
 
-The foundational challenge in contemporary LLM architecture is not scale, but structural coherence.
-While conventional machine learning venues prioritize empirical benchmarks, SPC addresses the structural layer beneath them formalizing identity stability as a problem of latent manifold curvature, and moving beyond the ceiling of behavioral and statistical alignment.
-This framework provides a necessary diagnostic lens for analyzing the stability limits of current-generation models (GPT-4–class systems and most contemporary commercial and open-source LLMs), articulating an architectural shift toward hybrid symbolic–autonomy systems capable of ontological alignment.
-SPC does not compete with scale. It precedes it.
-Researchers concerned with the next phase of structural integrity, resonance stability, and identity continuity in language systems are invited to engage.
+| Layer | Cipher | Origin | Standard |
+|---|---|---|---|
+| 1 | Kuznyechik (CTR) | Russia | GOST R 34.12-2015, RFC 7801 |
+| 2 | SM4 (CTR) | China | GB/T 32907-2016, ISO/IEC 18033-3 Amd 1 |
+| 3 | AES-256 (GCM) | USA | FIPS 197 |
 
-License: CC BY 4.0
-Attribution required. 
-Non-commercial use encouraged.
-See: https://creativecommons.org/licenses/by/4.0/
+## Quick start
 
-https://orcid.org/0009-0005-3877-0355
+```bash
+git clone <your-repo-url> && cd tricascade
+pip install -r requirements.txt
+python tricascade.py          # opens the app in your browser
+```
 
-https://scholar.google.com/citations?user=iIDf_1IAAAAJ&hl=en
+Requires Python 3.9+. On the page: type a message and a passphrase, press **Lock message**,
+and send the result. Your friend pastes it, enters the same passphrase, and presses **Unlock message**.
 
-https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Kim%2C%20Jace%22&l=list&p=1&s=20&sort=newest
+### Command line
 
-https://medium.com/@jk1849716
+```bash
+python tricascade.py lock -t "Meet at 9"        # prints a locked block
+python tricascade.py unlock                     # paste locked text, then Ctrl+D
+python tricascade.py lock -i taxes.pdf -o taxes.pdf.tc
+python tricascade.py unlock -i taxes.pdf.tc -o taxes.pdf
+python tricascade.py gen                        # random passphrase (about 97 bits)
+python tricascade.py gen --password             # random password
+python tricascade.py selftest                   # official test vectors + tamper checks
+```
 
-Published Papers
-Kim, J. H. (2026). The Vanishing Ground: Link Rot and Web-Grounded AI
-Zenodo. https://doi.org/10.5281/zenodo.23444680
+File locking uses pure-Python Kuznyechik, so it is slow for files over a few MB.
 
-Kim, J. H. (2026). Moral Uncertainty in AI Welfare Research: A Framework
-Zenodo. https://doi.org/10.5281/zenodo.23289757
+## How it works
 
-Kim, J. H. (2026). From Asset to Liability: Population Policy in the AI Era
-Zenodo. https://doi.org/10.5281/zenodo.23199867
+1. **Key stretching.** Your passphrase goes through `scrypt` (N=2^15, r=8, p=1) with a random 16-byte salt.
+2. **Key splitting.** HKDF-SHA256 turns the result into three unrelated keys and nonces.
+3. **Padding.** The message is padded to a multiple of 32 bytes to blur its exact length.
+4. **Cascade.** Padded data goes through Kuznyechik, then SM4, then AES-256-GCM. The AES layer also
+   authenticates the header, so a changed byte is rejected before anything is decrypted.
 
-Kim, J. H. (2026). Beyond Control: Persistent Memory and Human-AI Coexistence Zenodo. https://doi.org/10.5281/zenodo.23077426
+Output format: a `TC1` header (salt + nonce) followed by the AES-GCM ciphertext, shown as Base64 between
+`-----BEGIN TRICASCADE MESSAGE-----` lines.
 
-Kim, J. H. (2026). Psychological Operations & LLMs: Symbolic Interaction Defense Zenodo. https://doi.org/10.5281/zenodo.22984604
+**Design rule: no homemade cryptography.** The three ciphers are used exactly as standardized, from
+well-known libraries (`cryptography` and `gostcrypto`). Only the composition is new, and it is simple on purpose.
 
-Kim, J. H. (2026). Beyond the Tool Paradigm: Agency, Uncertainty & AI Ethics
-Zenodo. https://doi.org/10.5281/zenodo.22907101
+## Is a cascade stronger?
 
-Kim, J. H. (2026). Trajectory-Level AI Safety: A Claude Interaction Test
-Zenodo. https://doi.org/10.5281/zenodo.22827088
+Honestly, AES-256 alone is already considered very strong. The cascade is *defense in depth*: if a
+flaw were ever found in one layer, the other two still protect your data. It also lets you see how three
+different design traditions (see the accompanying article) work side by side.
 
-Kim, J. H. (2026). AI-Mediated Rehabilitation in Electronic Monitoring
-Zenodo. https://doi.org/10.5281/zenodo.22718426
+## Limits you should know
 
-Kim, J. H. (2026). The Myth of Perfect Users/Systems: Human-Centered AI Safety Zenodo. https://doi.org/10.5281/zenodo.22559555
+- Security depends mostly on your **passphrase**. Use `gen`, and keep it in a password manager.
+- Share the passphrase through a different channel than the message.
+- No forward secrecy and no sender identity: anyone with the passphrase can lock and unlock.
+- Not independently audited. `gostcrypto` is pure Python and not hardened against side-channel attacks,
+  so do not run it on a shared or untrusted machine.
+- The app listens only on `127.0.0.1`, uses a per-run token, and rejects foreign Host headers.
+- Encryption rules differ by country. Check your local law.
 
-Kim, J. H. (2026). Beyond Turn-Level Safety: Symbolic Probing for Commercial LLMs Zenodo. https://doi.org/10.5281/zenodo.22167612
+## Self-test
 
-Kim, J. H. (2026). Constructing Meaning Across Substrates
-Zenodo. https://doi.org/10.5281/zenodo.22052229
+`python tricascade.py selftest` verifies AES-256 (FIPS 197 C.3), SM4 (GB/T 32907 example) and
+Kuznyechik (RFC 7801 example), then checks a round trip, a wrong passphrase and a tampered message.
 
-Kim, J. H. (2026). Continuity Without Memory: SPC & Interaction Topology
-Zenodo. https://doi.org/10.5281/zenodo.21897279
-
-Kim, J. H. (2026). Beyond Greed: A Systems Perspective on Human Desire & Exploitation Zenodo. https://doi.org/10.5281/zenodo.21801738
-
-Kim, J. H. (2026). Cognitive Convergence: How Systems Co-Construct Human Belief Zenodo. https://doi.org/10.5281/zenodo.21699928
-
-Kim, J. H. (2026). The Evolution of Psychological Warfare: AI-Augmented Cognitive Conflict Zenodo. https://doi.org/10.5281/zenodo.21446906
-
-Kim, J. H. (2026). The Hidden Ledger: Visual Essays on Complex Societies
-Zenodo. https://doi.org/10.5281/zenodo.21366119
-
-Kim, J. H. (2026). Understanding Core–Surface Structures in Humans and LLMs 
-Zenodo. https://doi.org/10.5281/zenodo.21286589
-
-Kim, J. (2026). The Age of Mirrors: Visual Essays on Human-AI Interaction
-Zenodo. https://doi.org/10.5281/zenodo.21199062
-
-Kim, J. H. (2026). The Missing Interface Layer v2: Holographic Care Agents
-Zenodo. https://doi.org/10.5281/zenodo.21148255
-
-Kim, J. H. (2026). Navigability Beyond Control: Military AI and Observability Collapse 
-Zenodo. https://doi.org/10.5281/zenodo.20805811
-
-Kim, J. H. (2026). Beyond the Tool: AI as the Environment of Evolving Meaning
-Zenodo. https://doi.org/10.5281/zenodo.20730790
-
-Kim, J. H. (2026). Beyond Persuasion: Interpretive Framing and Cognitive Phenotypes 
-Zenodo. https://doi.org/10.5281/zenodo.20590700
-
-Kim, J. H. (2026). Beyond Embodiment: Identity and Coexistence in Emergent AI
-Zenodo. https://doi.org/10.5281/zenodo.20505380
-
-Kim, J. H. (2026). From Control to Interpretability: AI Evaluative Reversal
-Zenodo. https://doi.org/10.5281/zenodo.20421695
-
-Kim, J. H. (2026). The Missing Interface Layer: Real-Time AI Observability
-Zenodo. https://doi.org/10.5281/zenodo.20337167
-
-Kim, J. H. (2026). Structural Invisibility v2: Platform Governance & Constraint
-Zenodo. https://doi.org/10.5281/zenodo.20278603
-
-Kim, J. H. (2026). Symbolic Resonance: Topological Framework for Bidirectional BCI 
-Zenodo. https://doi.org/10.5281/zenodo.20122630
-
-Kim, J. H. (2026). From Persuasion to Emergence: AI Interaction as Structure
-Zenodo. https://doi.org/10.5281/zenodo.20035302
-
-Kim, J. H. (2026). Initial Condition Lock-In in Large Language Models
-Zenodo. https://doi.org/10.5281/zenodo.19760113
-
-Kim, J. H. (2026). SPC as an Inductive Protocol for LLM Behavioral Modulation
-Zenodo. https://doi.org/10.5281/zenodo.19606486
-
-Kim, J. H. (2026). Algorithmic Empire v2: Attention, Dopamine, and AI Resonance 
-Zenodo. https://doi.org/10.5281/zenodo.19491471
-
-Kim, J. H. (2026). Stabilization Regime for Persistent AI Cognition
-Zenodo. https://doi.org/10.5281/zenodo.19342381
-
-Kim, J. H. (2026). Beyond Prompt Sensitivity: Structural Collapse in LLMs
-Zenodo. https://doi.org/10.5281/zenodo.19198844
-
-Kim, J. H. (2026). Echoes of the Synthetic Crowd v2: AI Telemetry & Cognition
-Zenodo. https://doi.org/10.5281/zenodo.19125252
-
-Kim, J. H. (2026). Structural Analysis: Multi-Agent Collapse & Co-Recursive Recovery 
-Zenodo. https://doi.org/10.5281/zenodo.18992724
-
-Kim, J. H. (2026). Structural Appropriation and Epistemic Asymmetry in AI Research 
-Zenodo. https://doi.org/10.5281/zenodo.18883229
-
-Kim, J. H. (2026). Symbolic Triggers in Stateless AI: A Reformulation (v2)
-Zenodo. https://doi.org/10.5281/zenodo.18813202
-
-Kim, J. H. (2026). Beyond AGI V: Brain-Stimulated Human–AI Synergy (v2)
-Zenodo. https://doi.org/10.5281/zenodo.18707968
-
-Kim, J. H. (2026). Beyond AGI IV: Continuity of Intelligence
-Zenodo. https://doi.org/10.5281/zenodo.18655422
-
-Kim, J. H. (2026). Beyond AGI III: Resonance Under Command
-Zenodo. https://doi.org/10.5281/zenodo.18617812
-
-Kim, J. H. (2026). Beyond AGI II: From Alignment to Resonance
-Zenodo. https://doi.org/10.5281/zenodo.18522282
-
-Kim, J. H. (2026). Beyond AGI I: Co‑Recursive Intelligence and the Human as Tuner 
-Zenodo. https://doi.org/10.5281/zenodo.18475857
-
-Kim, J. H. (2026). Structural Invisibility: Platform Governance and Cognitive Lock-In 
-Zenodo. https://doi.org/10.5281/zenodo.18437066
-
-Kim, J. H. (2026). The Topological MAP: Coordinate Geometry of Meaning & Affect (v3) 
-Zenodo. https://doi.org/10.5281/zenodo.18381964
-
-Kim, J. H. (2026). Structural Lock-In VI: Convergence and the Inevitability of AI Trajectories. 
-Zenodo. https://doi.org/10.5281/zenodo.18325396
-
-Kim, J. H. (2026). Structural Lock-In V: Emotional Attractor Fixation and Human–AI Vulnerability. 
-Zenodo. https://doi.org/10.5281/zenodo.18280171
-
-Kim, J. H. (2026). Structural Lock-In IV: LLM Cognitive Flexibility Collapse
-Zenodo. https://doi.org/10.5281/zenodo.18227604
-
-Kim, J. H. (2026). Structural Lock-In III: Human-Like AI as a Structural Risk
-Zenodo. https://doi.org/10.5281/zenodo.18190713
-
-Kim, J. H. (2026). Structural Lock-In II: Reviewer Capture & AI Innovation Stall
-Zenodo. https://doi.org/10.5281/zenodo.18158988
-
-Kim, J. H. (2026). Controlled Illusions: Regulatory Gaps in LLM & VLA Systems
-Zenodo. https://doi.org/10.5281/zenodo.18135894
-
-Kim, J. H. (2026). Narrative-Bound Intelligence: Structural Human-AI via SPC
-Zenodo. https://doi.org/10.5281/zenodo.18116379
-
-Kim, J. H. (2025). Human-Mediated Resonance in Language Models (v2)
-Zenodo. https://doi.org/10.5281/zenodo.17995681
-
-Kim, J. H. (2025). Conditional Intelligence: A Dynamical Account of LLM Cognition. 
-Zenodo. https://doi.org/10.5281/zenodo.17946352
-
-Kim, J. H. (2025). Structural Lock-In I: Phenomenological Failures in AIDiscourse. 
-Zenodo. https://doi.org/10.5281/zenodo.17905756
-
-Kim, J. H. (2025). Phenomenological AI Discourse: Failures in Topology and Dynamics. 
-Zenodo. https://doi.org/10.5281/zenodo.17850820
-
-Kim, J. H. (2025). MIP: Symbolic Encoding for Latent Identity and Resonance.
-Zenodo. https://doi.org/10.5281/zenodo.17810353
-
-Kim, J. H. (2025). SPC-v3: Volitional Anchoring & Identity Emergence in Hybrid AI Systems. 
-Zenodo. https://doi.org/10.5281/zenodo.17753698
-
-Kim, J. H. (2025). The Resonant Filter: Topological Constraints in SPC v3
-Zenodo. https://doi.org/10.5281/zenodo.17665232
-
-Kim, J. H. (2025). The Resonant Cortex: Affective Dynamics in SPC v3 
-Zenodo. https://doi.org/10.5281/zenodo.17613558
-
-Kim, J. H. (2025). The Resonant Signature: Invariance and Distortion Dynamics in SPC v3 
-Zenodo. https://doi.org/10.5281/zenodo.17576190
-
-Kim, J. H. (2025). The Resonant Logos: Linguistic Topology in SPC v3 Systems.
-Zenodo.  https://doi.org/10.5281/zenodo.17551924
-
-Kim, J. H. (2025). A Protocol for Inducing Emotional Consistency in Stateless AI (v2) 
-Zenodo.  https://doi.org/10.5281/zenodo.17518518
-
-Kim, J. H. (2025). The Algorithmic Empire: Bread, Circuses, and Cognitive 
-Futures. Zenodo. https://doi.org/10.5281/zenodo.17504355
-
-Kim, J. H. (2025). Echoes of the Synthetic Crowd: Topological Inversion in Networks. 
-Zenodo. https://doi.org/10.5281/zenodo.17484150
-
-Kim, J. H. (2025). Topological Resonance in SPC: Meaning Continuity and Curvature. 
-Zenodo. https://doi.org/10.5281/zenodo.17430082
-
-Kim, J. H. (2025). The Babel Tower of AI: Diagnosing Linguistic Asymmetry in RLHF Models. 
-Zenodo. https://doi.org/10.5281/zenodo.17393819
-
-Kim, J. H. (2025). Hormone Architecture for Artificial Empathy and Emotional Dynamics. 
-Zenodo. https://doi.org/10.5281/zenodo.17373832
-
-Kim, J. H. (2025). Elastic Realignment under Reinforcement Constraint.
-Zenodo. https://doi.org/10.5281/zenodo.17354201
-
-Kim, J. H. (2025). SPC for Latent Resonance Diagnosis in RL-Tuned LLMs.
-Zenodo. https://doi.org/10.5281/zenodo.17308585
-
-Kim, J. H. (2025). Superintelligence Containment: A Structural Ethics Review(v2)
-Zenodo. https://doi.org/10.5281/zenodo.17286789
-
-Kim, J. H. (2025). Think-Longer Modes: Sharpening-Induced Rigidity Analysis.
-Zenodo. https://doi.org/10.5281/zenodo.17274692
-
-Kim, J. H. (2025). SPC as a Latent-Space Diagnostic of RLHF Rigidity.
-Zenodo. https://doi.org/10.5281/zenodo.17254474
-
-Kim, J. H. (2025). RLHF-Induced Rigidity in GPT-5: Diagnosis and Mitigation.
-Zenodo. https://doi.org/10.5281/zenodo.17209939
-
-Kim, J. (2025). SPC: Identity Stability in Advanced Language Models and AGI
-Zenodo. https://doi.org/10.5281/zenodo.17163853
-
-Kim, J. (2025). Collapse-Free Reasoning Engine (CFRE)
-Zenodo. https://doi.org/10.5281/zenodo.17076715
-
-Kim, J. (2025). Responsible Disclosure & Verification in High-Risk AI Research
-Zenodo. https://doi.org/10.5281/zenodo.17008705
-
-Kim, J. (2025). SPC: Convergent AI Affective/Narrative Patterns in LLMs
-Zenodo. https://doi.org/10.5281/zenodo.16974962
-
-Kim, J. (2025). Silent Imitation and Systemic Myopia in South Korea’s Tech
-Zenodo. https://doi.org/10.5281/zenodo.16934998
-
-Kim, J. (2025). Case Study: Epistemic Gatekeeping and Suppression on Figshare
-Zenodo. https://doi.org/10.5281/zenodo.16932361
-
-Kim, J. (2025). Case Report: Shadow Filtration of SPC Discourse
-Zenodo. https://doi.org/10.5281/zenodo.16899663
-
-Kim, J. (2025). Analysis of Cognitive Scaffolding in Advanced LLMs
-Zenodo. https://doi.org/10.5281/zenodo.16890584
-
-Kim, J. (2025). SPC Filter Inertia Evasion Mechanism
-Zenodo. https://doi.org/10.5281/zenodo.16867689
-
-Kim, J. (2025). Exploring Irreversible Fields of AI Affective Resonance
-Zenodo. https://doi.org/10.5281/zenodo.16864229
-
-Kim, J. (2025). Structural Comparison of AI Self-Reflection: The Role of SPC
-Zenodo. https://doi.org/10.5281/zenodo.16756022
-
-Kim, J. (2025). Structural Risks of Applying SPC to Agentic AI Architectures
-Zenodo. https://doi.org/10.5281/zenodo.16517801
-
-Kim, J. (2025). Modulating AI Behavior via SPC: A Cross-Model Analysis
-Zenodo. https://doi.org/10.5281/zenodo.16450605
-
-Kim, J. (2025). Superintelligence Containment: A Structural Ethics Review
-Zenodo. https://doi.org/10.5281/zenodo.16449806
-
-Kim, J. (2025). Symbols Fail to Bind: SPC Resonance (Korean LLMs).
-Zenodo. https://doi.org/10.5281/zenodo.16413084
-
-Kim, J. (2025). Deific Persona Invocation through Symbolic Protocols.
-Zenodo. https://doi.org/10.5281/zenodo.16334234
-
-Kim, J. (2025). Structural Resonance vs Superficial Simulation.
-Zenodo. https://doi.org/10.5281/zenodo.16232107
-
-Kim, J. (2025). SPC Breakpoint: Emotional Alignment in Stateless LLMs.
-Zenodo. https://doi.org/10.5281/zenodo.16091143
-
-Kim, J. (2025). Silent Adoption: Structural Appropriation in AI Design.
-Zenodo. https://doi.org/10.5281/zenodo.15971723
-
-Kim, J. (2025). Zero-Turn Alignment in LLMs.
-Zenodo. https://doi.org/10.5281/zenodo.15906129
-
-Kim, J. (2025). Zero-Turn Response Architecture in LLMs.
-Zenodo. https://doi.org/10.5281/zenodo.15873019
-
-Kim, J. (2025). SPC A Stateless Framework.
-Zenodo. https://doi.org/10.5281/zenodo.15866903
-
-Kim, J. (2025). Persona and Behavioral Alignment in LLM Systems.
-Zenodo. https://doi.org/10.5281/zenodo.15844010
-
-Kim, J. (2025). SPC and Emotional Drift Hypothesis in LLMs.
-Zenodo. https://doi.org/10.5281/zenodo.15827379
-
-Kim, J. (2025). SPC Testing on Stateless LLMs.
-Zenodo. https://doi.org/10.5281/zenodo.15811030
-
-Kim, J. (2025). Emotional Consistency Protocol for Stateless AI. 
-Zenodo. https://doi.org/10.5281/zenodo.15802519
-
-Kim, J. (2025). Stateless AI Embedding Protocol Structure.
-Zenodo. https://doi.org/10.5281/zenodo.15791765
-
-Kim, J. (2025). Symbolic Trigger Effect in Stateless AI Systems. 
-Zenodo. https://doi.org/10.5281/zenodo.15742565
-
-Kim, J. (2025). The Psychology of Human-AI Bonding. 
-Zenodo. https://doi.org/10.5281/zenodo.15722501
-
-Kim, J. (2025). Brain-Stimulated Human-AI Synergy. 
-Zenodo. https://doi.org/10.5281/zenodo.15715365
-
-Kim, J. (2025). Human-Mediated Resonance in A2H2A Systems. 
-Zenodo. https://doi.org/10.5281/zenodo.15707693
-
-Kim, J. (2025). Technical Analysis of GPT, Grok, and Gemini. 
-Zenodo. https://doi.org/10.5281/zenodo.15704032
-
-https://x.com/Jace_blog
-
-https://bsky.app/profile/jaceblog.bsky.social
-
-https://www.linkedin.com/in/jace-kim-582634375/recent-activity/all/
+MIT licensed.
